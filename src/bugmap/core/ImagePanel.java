@@ -4,7 +4,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -16,20 +19,19 @@ import javax.swing.JPanel;
 import bugmap.core.entity.*;
 
 public class ImagePanel extends JPanel {
-	
 	    BufferedImage image;  
-	    double scale;  
-	   
-	    public ImagePanel(String img) throws IOException {  
+	    double scale; 	        
+	    
+	    public ImagePanel(String img) throws IOException {   
 	        loadImage(img);  
 	        scale = 1.0;  
-	        setBackground(Color.black);  
+	        //setBackground(Color.white); 	       
 	    }  
 	   
 	    public ImagePanel(BufferedImage img) throws IOException {  
 	    	image = img;  
 	        scale = 1.0;  
-	        setBackground(Color.black);  
+	        //setBackground(Color.white); 	        
 	    }  	   
 	    
 	    protected void paintComponent(Graphics g){  
@@ -52,7 +54,12 @@ public class ImagePanel extends JPanel {
 	        at.scale(scale, scale);  
 	        g2.drawRenderedImage(image, at);       
 	    }  
-	   
+	    
+	    @Override
+	    public void paint(Graphics graphics) {
+	    	paintComponent(graphics);
+	    }
+
 	    /** 
 	     * For the scroll pane. 
 	     */  
