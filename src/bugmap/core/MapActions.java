@@ -5,13 +5,21 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.JApplet;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import bugmap.core.entity.Log;
 import bugmap.core.entity.Map;
 
-public class MapActions {
+public class MapActions{
+	
+	private static ImagePanel impanel = null;
+	
+	
 	private static BufferedImage createMap(int column,int row) {      
 	      if (AppConfig.isDEBUG()){
           	Log.getTRACE().debug("column=" +column); 
@@ -37,36 +45,44 @@ public class MapActions {
         }        
         return im;
     }
+	private static JSlider getSlider() {          
+        JSlider slider = new JSlider(JSlider.VERTICAL, 4, 12, 10);  
+        slider.setMinorTickSpacing(1);  
+        slider.setMajorTickSpacing(2);  
+        slider.setPaintTicks(true);  
+        slider.setPaintLabels(true);
+       //slider.setLabelTable(getLabelTable(100, max, 25));  
+
+        slider.addChangeListener(new ChangeListener() {  
+            public void stateChanged(ChangeEvent e) {  
+                int value = ((JSlider)e.getSource()).getValue();                  
+                impanel.setScale(value/10.0);   
+            }  
+        });  
+        return slider;  
+    }  
+	
+	private static void initFrame(){
+		JFrame f = new JFrame();  	
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);        
+        f.getContentPane().add(new JScrollPane(impanel));   
+        f.getContentPane().add(getSlider(),"East");
+        f.setSize(AppConfig.getAppWidth(), AppConfig.getAppHeight());  
+        f.setLocation(1,1);  
+        f.setVisible(true);          
+	}
 	
 	
 	public static void showMaps() throws IOException {	
-		//ImagePanel impanel = new ImagePanel(createMap(AppConfig.getAppWidth()/AppConfig.mapWidth,AppConfig.getAppHeight()/AppConfig.mapHeight));
-		;
-		ImagePanel impanel = new ImagePanel(createMap((int)Math.ceil((double)AppConfig.getAppWidth() / AppConfig.mapWidth),2));
-		ImageZoom imzoom = new ImageZoom(impanel);
-		JFrame f = new JFrame();  
-		
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
-        f.getContentPane().add(imzoom.getUIPanel(), "North"); 
-        
-        f.getContentPane().add(new JScrollPane(impanel));        
-        f.setSize(AppConfig.getAppWidth(), AppConfig.getAppHeight());  
-        f.setLocation(1,1);  
-        f.setVisible(true); 
+		//ImagePanel impanel = new ImagePanel(createMap(AppConfig.getAppWidth()/AppConfig.mapWidth,AppConfig.getAppHeight()/AppConfig.mapHeight));		
+		//impanel = new ImagePanel(createMap((int)Math.ceil((double)AppConfig.getAppWidth() / AppConfig.mapWidth),2));
+		impanel = new ImagePanel(createMap(20,2));
+		initFrame();		
 	}
 	
 	public static void showMap(String source) throws IOException {			
-		ImagePanel impanel = new ImagePanel(source);	
-		ImageZoom imzoom = new ImageZoom(impanel);
-		JFrame f = new JFrame();  
-		
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
-        f.getContentPane().add(imzoom.getUIPanel(), "North"); 
-        
-        f.getContentPane().add(new JScrollPane(impanel));              
-        f.setSize(AppConfig.getAppWidth(), AppConfig.getAppHeight());  
-        f.setLocation(1,1);  
-        f.setVisible(true); 
+		impanel = new ImagePanel(source);			
+		initFrame();	
 	}
 	
 }

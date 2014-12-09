@@ -1,5 +1,6 @@
 package bugmap.core;
 
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 
 import org.apache.log4j.*;
@@ -14,7 +15,11 @@ public class AppConfig {
 	
 	private static int appWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
 	
-	private static int appHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
+	private static int appHeight = Toolkit.getDefaultToolkit().getScreenSize().height -
+			Toolkit.getDefaultToolkit().getScreenInsets(
+					GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration()
+					).bottom;
+
 	
 	public static final int mapWidth = 160;
 	public static final int mapHeight = 240;
