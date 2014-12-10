@@ -14,12 +14,12 @@ import bugmap.core.entity.Log;
     public class ImagePanel extends JPanel {
     	private BufferedImage image;  
  	    double scale; 	        
- 	    Point offset = new Point(0, 0);
+ 	    Point offset;
+ 		Point startPoint;
  	    MapMouseAdapter movingAdapt = new MapMouseAdapter();
  	       		
  	    public void setScale(double s) {  
-	    	scale = s;  	        
-	        revalidate();      // update the scroll pane  
+	    	scale = s;  	         
 	        repaint();  
 	    }  
  	    
@@ -33,13 +33,27 @@ import bugmap.core.entity.Log;
 			}                                        
 	    }
 	    
+	    
+		public void setMoveFrom(Point p){
+			startPoint = p;
+			startPoint.x -= offset.x;
+			startPoint.y -= offset.y;		
+		}
+		
+		public void setMoveTo(Point p){		   	        
+	        offset = new Point(p.x - startPoint.x, p.y - startPoint.y);
+	        repaint();
+		}
+		
 		private void initPanel(){
 			scale = 1.0;  			
+			offset = new Point(1, 1);
 			addMouseMotionListener(movingAdapt);
 			addMouseListener(movingAdapt);
 			addMouseWheelListener(movingAdapt);
 			setBorder(BorderFactory.createEmptyBorder(0,10,10,10)); 
 			setBackground(Color.white); 	
+		   // setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			
 		}
 		
@@ -64,10 +78,7 @@ import bugmap.core.entity.Log;
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            if (image != null) {
-                if (offset == null) {
-                    offset = new Point(0, 0);
-                }
+            if (image != null) {    
             	Graphics2D g2 = (Graphics2D)g;  
                 g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,  
                         			RenderingHints.VALUE_INTERPOLATION_BICUBIC);                     
@@ -82,10 +93,11 @@ import bugmap.core.entity.Log;
     	        	Log.getTRACE().debug("scale to "+ scale);	
     	        	Log.getTRACE().debug("new size = ("+ w+","+h+")");
     	        }
-    	        AffineTransform at = AffineTransform.getTranslateInstance(x,y);  
-    	        at.scale(scale, scale);
-    	        g2.translate(offset.x,offset.y);
-    	        g2.drawRenderedImage(image, at);    	        
+    	        AffineTransform at = AffineTransform.getTranslateInstance(x,y);
+    	        at.scale(scale, scale);    	        
+    	        g2.translate(offset.x*scale,offset.y*scale);
+    	        g2.drawRenderedImage(image, at);
+    	        
     	        g2.dispose();
     	    }
         }          	  

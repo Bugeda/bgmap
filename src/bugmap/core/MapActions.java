@@ -1,13 +1,13 @@
 package bugmap.core;
 
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.*;
-import java.awt.geom.Rectangle2D;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,6 @@ public class MapActions extends JFrame {
 	static final int MAX_scale = 129;
 	static final int MIN_scale = 4;
 	static final int START_scale = 100;	
-    private Point mouseClickPoint;   
     MapMouseAdapter movingAdapt = new MapMouseAdapter();
     
 	private static BufferedImage createMap(int column,int row) {      
@@ -58,7 +57,23 @@ public class MapActions extends JFrame {
         }        
         return im;
     }
-	
+	private static Image iconToImage(Icon icon) {
+        if (icon instanceof ImageIcon) {
+            return ((ImageIcon)icon).getImage();
+        } else {
+            int w = icon.getIconWidth();
+            int h = icon.getIconHeight();
+            GraphicsEnvironment ge =
+              GraphicsEnvironment.getLocalGraphicsEnvironment();
+            GraphicsDevice gd = ge.getDefaultScreenDevice();
+            GraphicsConfiguration gc = gd.getDefaultConfiguration();
+            BufferedImage image = gc.createCompatibleImage(w, h);
+            Graphics2D g = image.createGraphics();
+            icon.paintIcon(null, g, 0, 0);
+            g.dispose();
+            return image;
+        }
+    }
 	private static void createSlider() {          
         slider = new JSlider(JSlider.VERTICAL, MIN_scale, MAX_scale, START_scale);
         slider.setInverted(true);
@@ -69,6 +84,7 @@ public class MapActions extends JFrame {
         slider.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         //slider.setLabelTable(null);         
     }  
+	
 	
 	private void setFrameParam(){
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);                    
@@ -81,8 +97,8 @@ public class MapActions extends JFrame {
 		getContentPane().add(slider, "East");
 		 slider.addChangeListener(new ChangeListener() {  
 	            public void stateChanged(ChangeEvent e) {  
-	                int value = ((JSlider)e.getSource()).getValue();          
-	                impanel.setScale(value/100.0);                
+	                int value = ((JSlider)e.getSource()).getValue();     
+	                impanel.setScale(value/100.0);	                	               
 	            }  
 	        });         
 		setSize(AppConfig.getAppWidth(), AppConfig.getAppHeight());  

@@ -16,8 +16,8 @@ public class Divide {
 		
 		//29120 x 43680   
 		//320 x 480
-		AppConfig.setConfig(false);		
-		MapActions.showMap(srcMapPath+"f.png");		
+		AppConfig.setConfig(false);
+		MapActions ma = new MapActions(srcMapPath+"f.png");		
 	
 		 try {     
 			 BufferedImage image = ImageIO.read(new File(srcMapPath+"f.png"));
