@@ -1,6 +1,9 @@
 package bugmap.core;
 
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.*;
@@ -19,11 +22,11 @@ import bugmap.core.entity.*;
 public class MapActions extends JFrame {		
 	static ImagePanel impanel;
 	static JSlider slider;
-	static final int MAX_scale = 150;
+	static final int MAX_scale = 129;
 	static final int MIN_scale = 4;
 	static final int START_scale = 100;	
     private Point mouseClickPoint;   
-    MouseListener movingAdapt = new MouseListener();
+    MapMouseAdapter movingAdapt = new MapMouseAdapter();
     
 	private static BufferedImage createMap(int column,int row) {      
 	      if (AppConfig.isDEBUG()){
@@ -32,12 +35,18 @@ public class MapActions extends JFrame {
           }
 		BufferedImage im = new BufferedImage(AppConfig.mapWidth*column,row*AppConfig.mapHeight, BufferedImage.TYPE_INT_ARGB);
 		BufferedImage image = null;
+		
         try {        	                    
             for(int y=0; y < row; y++ ) {
             	for(int x=0; x < column; x ++ ) {          
             	    if (AppConfig.isDEBUG()){
        	            		Log.getTRACE().debug("add "+AppConfig.mapsPath+"1_"+y+"_"+x+".png");        	            		
        	            	}
+            	    
+            	  //   java.net.URL imageurl = MapActions.class.getResource(AppConfig.mapsPath+"1_"+y+"_"+x+".png");
+//            	     System.out.println(imageurl);
+  //          	     Image imageX = new javax.swing.ImageIcon(imageurl).getImage();
+           	    
             	    image = ImageIO.read(new File(AppConfig.mapsPath+"1_"+y+"_"+x+".png"));
                     im.getGraphics().drawImage(image, x*AppConfig.mapWidth, y*AppConfig.mapHeight, null);                    
                 }
@@ -57,66 +66,18 @@ public class MapActions extends JFrame {
         slider.setMajorTickSpacing(25);  
         slider.setPaintTicks(true);  
         slider.setPaintLabels(true);
+        slider.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         //slider.setLabelTable(null);         
     }  
 	
-	/*
-	 *  private static void addMouseListeners(){
-		  slider.addChangeListener(new ChangeListener() {  
-	            public void stateChanged(ChangeEvent e) {  
-	                int value = ((JSlider)e.getSource()).getValue();          
-	                impanel.setScale(value/10.0);                
-	            }  
-	        });            
-		  slider.addMouseWheelListener(new MouseWheelListener(){
-	    		public void mouseWheelMoved(MouseWheelEvent e){
-	    			slider.setValue(e.getWheelRotation()*10);;
-	    			
-	    		}    
-	        });      
-		  impanel.addMouseWheelListener(new MouseWheelListener(){
-	    		public void mouseWheelMoved(MouseWheelEvent e){
-	    			int wheel = e.getWheelRotation();
-	    		      if (AppConfig.isDEBUG()){
-			          	Log.getTRACE().debug("wheel=" +wheel); 
-			          	Log.getTRACE().debug("slider.getValue()= "+slider.getValue());
-			          	Log.getTRACE().debug("impanel.scale= "+impanel.scale); 
-			          }
-	    			if ((wheel>0)&&(slider.getValue()+wheel>MIN_scale)){
-	    				slider.setValue(slider.getValue()+wheel);
-	    			
-	    			}
-	      			if ((wheel<0)&&(slider.getValue()+wheel<MAX_scale)){
-	    				slider.setValue(slider.getValue()+wheel);
-	    			
-	    			}
-	    		}    
-	        });
-		  impanel.addMouseMotionListener(new MouseMotionListener() {
-			
-			@Override
-			public void mouseMoved(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseDragged(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});			  		 
-	}*/
-	
 	private void setFrameParam(){
-	//	setBackground(Color.white); 	
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);                    
-		//getContentPane().add(new JScrollPane(impanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
-			//										 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
-		getContentPane().add(new JScrollPane(impanel));        
+		getContentPane().add(new JScrollPane(impanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
+													 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+		//getContentPane().add(new JScrollPane(impanel));        
 
 		createSlider();   
-		impanel.setDoubleBuffered(true);
+		impanel.setDoubleBuffered(false);
 		getContentPane().add(slider, "East");
 		 slider.addChangeListener(new ChangeListener() {  
 	            public void stateChanged(ChangeEvent e) {  
@@ -124,12 +85,9 @@ public class MapActions extends JFrame {
 	                impanel.setScale(value/100.0);                
 	            }  
 	        });         
-	//	impanel.addMouseMotionListener(movingAdapt);
-	//	impanel.addMouseListener(movingAdapt);
-		impanel.addMouseWheelListener(movingAdapt);   
 		setSize(AppConfig.getAppWidth(), AppConfig.getAppHeight());  
 		setLocation(1,1);          
-		setVisible(true);		
+		setVisible(true);			
 	}
 		
 	

@@ -1,5 +1,6 @@
 package bugmap.core;
 
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -7,10 +8,10 @@ import java.awt.event.MouseWheelListener;
 
 import bugmap.core.entity.Log;
 
-public class MouseListener extends MouseAdapter {
-	private int x;
-    private int y;
-
+public class MapMouseAdapter extends MouseAdapter {
+	
+	private Point startPoint;
+	
     @Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		int wheel = e.getWheelRotation();
@@ -28,36 +29,27 @@ public class MouseListener extends MouseAdapter {
 		}
 		
 	}
-	
-	@Override
-	public void mousePressed(MouseEvent e) {	
-		x=e.getX();
-		y=e.getY();
-	}
-	
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		
-		/*System.out.println(x +" "+y);*/		
-		int dx = e.getX() - x;
-		int dy = e.getY() - y;
-		/*System.out.println(dx +" "+dy);*/
-		System.out.println(e.getX() +" "+e.getY());
-		//MapActions.impanel.move(e.getX(), e.getY());
-		//MapActions.impanel.setSize(MapActions.impanel.getWidth()-dx, MapActions.impanel.getHeight()-dy);
-		MapActions.impanel.setBounds(dx, dy, MapActions.impanel.getWidth(), MapActions.impanel.getHeight());
+	 
+    @Override
+    public void mousePressed(MouseEvent e) {
+        startPoint = e.getPoint();
+        startPoint.x -= MapActions.impanel.offset.x;
+        startPoint.y -= MapActions.impanel.offset.y;
+    }
 
-		/*
-		if (MapActions.impanel.getBounds().contains(x, y)) {
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        startPoint = null;
+    }
 
-			
-			dx++;
-		    dy++;
-		   
-		    MapActions.impanel.paint(MapActions.impanel.getGraphics());
-		 
-		    /
-		}*/
-	}
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        Point p = e.getPoint();
+        int x = p.x - startPoint.x;
+        int y = p.y - startPoint.y;
+        
+        MapActions.impanel.offset = new Point(x, y);
+        MapActions.impanel.repaint();
+    }
 
 }
