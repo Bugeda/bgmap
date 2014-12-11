@@ -17,25 +17,28 @@ public class Divide {
 		//29120 x 43680   
 		//320 x 480
 		AppConfig.setConfig(false);
-		MapActions ma = new MapActions(srcMapPath+"f.png");		
+		//MapActions ma = new MapActions(srcMapPath+"p1.png");		
 	
 		 try {     
-			 BufferedImage image = ImageIO.read(new File(srcMapPath+"f.png"));
+			 BufferedImage image = ImageIO.read(new File(srcMapPath+"p2.png"));
 			 int column = image.getWidth(null)/AppConfig.mapWidth;			
 	    	 int row = image.getHeight(null)/AppConfig.mapHeight; 
 	         if (AppConfig.isDEBUG()){
 	        	 Log.getTRACE().debug("column=" +column); 
 	        	 Log.getTRACE().debug("row= "+row); 
 	        	 }
-	            
+	         int pos=45;
 	         for(int y = 0 ; y < row; y++) {
+	        	 pos++;
+	        	 Log.getDEBUG().debug("create "+AppConfig.mapsPath+"1_"+pos+"_x.png");
 	        	 for(int x = 0; x < column; x++ ) {               
 	        		 BufferedImage newImage = new BufferedImage(AppConfig.mapWidth, AppConfig.mapHeight, BufferedImage.TYPE_INT_ARGB);                	   		
 	        		 newImage.createGraphics().drawImage(image, x*(-AppConfig.mapWidth), y*(-AppConfig.mapHeight), null);            	             		
-	        		 ImageIO.write(newImage, "png", new File(AppConfig.mapsPath+"1_"+y+"_"+x+".png")); 
+	        		 ImageIO.write(newImage, "png", new File(AppConfig.mapsPath+"1_"+pos+"_"+x+".png")); 
 	        		 if (AppConfig.isDEBUG()) 
-	        			 Log.getDEBUG().debug("create "+AppConfig.mapsPath+"1_"+y+"_"+x+".png");
+	        			 Log.getDEBUG().debug("create "+AppConfig.mapsPath+"1_"+pos+"_"+x+".png");
 	        	 	}
+	        	
 	        	 }
 	         } catch (Exception e) {	        	 
 	        	 Log.getTRACE().error(e+" "+srcMapPath+"f.png");

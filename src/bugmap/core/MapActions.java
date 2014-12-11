@@ -27,7 +27,7 @@ public class MapActions extends JFrame {
 	static final int START_scale = 100;	
     MapMouseAdapter movingAdapt = new MapMouseAdapter();
     
-	private static BufferedImage createMap(int column,int row) {      
+	private static BufferedImage createMap(int size, int startposition, int column, int row) {      
 	      if (AppConfig.isDEBUG()){
           	Log.getTRACE().debug("column=" +column); 
           	Log.getTRACE().debug("row= "+row); 
@@ -35,18 +35,19 @@ public class MapActions extends JFrame {
 		BufferedImage im = new BufferedImage(AppConfig.mapWidth*column,row*AppConfig.mapHeight, BufferedImage.TYPE_INT_ARGB);
 		BufferedImage image = null;
 		
-        try {        	                    
-            for(int y=0; y < row; y++ ) {
+        try {        	              	
+            for(int y=0; y < row; y++ ) {        
+            	startposition++;
             	for(int x=0; x < column; x ++ ) {          
             	    if (AppConfig.isDEBUG()){
-       	            		Log.getTRACE().debug("add "+AppConfig.mapsPath+"1_"+y+"_"+x+".png");        	            		
+       	            		Log.getTRACE().debug("add "+AppConfig.mapsPath+size+"_"+startposition+"_"+x+".png");        	            		
        	            	}
             	    
             	  //   java.net.URL imageurl = MapActions.class.getResource(AppConfig.mapsPath+"1_"+y+"_"+x+".png");
 //            	     System.out.println(imageurl);
   //          	     Image imageX = new javax.swing.ImageIcon(imageurl).getImage();
            	    
-            	    image = ImageIO.read(new File(AppConfig.mapsPath+"1_"+y+"_"+x+".png"));
+            	    image = ImageIO.read(new File(AppConfig.mapsPath+size+"_"+startposition+"_"+x+".png"));
                     im.getGraphics().drawImage(image, x*AppConfig.mapWidth, y*AppConfig.mapHeight, null);                    
                 }
             }        	
@@ -110,7 +111,7 @@ public class MapActions extends JFrame {
 	public MapActions() throws IOException{		
 		//ImagePanel impanel = new ImagePanel(createMap(AppConfig.getAppWidth()/AppConfig.mapWidth,AppConfig.getAppHeight()/AppConfig.mapHeight));		
 		//impanel = new ImagePanel(createMap((int)Math.ceil((double)AppConfig.getAppWidth() / AppConfig.mapWidth),2));
-		impanel = new ImagePanel(createMap(182,2));
+		impanel = new ImagePanel(createMap(1,45,182,10));
 		setFrameParam();		
 	}
 		
