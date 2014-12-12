@@ -9,20 +9,22 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
+import org.eclipse.swt.internal.win32.OFNOTIFY;
+
 import bugmap.core.entity.Log;
 
     public class ImagePanel extends JPanel {
-    	private BufferedImage image;  
+    	private static BufferedImage image;  
  	    double scale; 	        
  	    Point offset;
  		Point startPoint;
- 	    MapMouseAdapter movingAdapt = new MapMouseAdapter();
- 	       		
- 	    public void setScale(double s) {  
+ 	    MapMouseAdapter movingAdapt = new MapMouseAdapter(); 	   
+
+		public void setScale(double s) {  
 	    	scale = s;  	         
 	        repaint();  
 	    }  
- 	    
+		
 	    public void loadImage(String fileName) {          
 	        try {
 				image = ImageIO.read(new File(fileName));
@@ -46,15 +48,13 @@ import bugmap.core.entity.Log;
 		}
 		
 		private void initPanel(){
-			scale = 1.0;  			
-			offset = new Point(1, 1);
+			scale = 1.0;  				
+			offset = new Point(0, 0);
 			addMouseMotionListener(movingAdapt);
 			addMouseListener(movingAdapt);
 			addMouseWheelListener(movingAdapt);
 			setBorder(BorderFactory.createEmptyBorder(0,10,10,10)); 
-			setBackground(Color.white); 	
-		   // setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			
+			setBackground(Color.white); 				
 		}
 		
 		public ImagePanel(String img) throws IOException {   
@@ -88,17 +88,11 @@ import bugmap.core.entity.Log;
     	        int imageHeight = image.getHeight();  
     	        double x = (w - scale * imageWidth)/2;  
     	        double y = (h - scale * imageHeight)/2;  
-    	        if (AppConfig.isDEBUG()){
-    	        	Log.getTRACE().debug("new coordinates = ("+ x+","+y+")");
-    	        	Log.getTRACE().debug("scale to "+ scale);	
-    	        	Log.getTRACE().debug("new size = ("+ w+","+h+")");
-    	        }
     	        AffineTransform at = AffineTransform.getTranslateInstance(x,y);
     	        at.scale(scale, scale);    	        
     	        g2.translate(offset.x*scale,offset.y*scale);
-    	        g2.drawRenderedImage(image, at);
-    	        
-    	        g2.dispose();
+    	        g2.drawRenderedImage(image, at);    	        
+    	        g2.dispose();         	
     	    }
         }          	  
     }
