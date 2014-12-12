@@ -17,23 +17,23 @@ public class Divide {
 		//29120 x 43680   
 		//320 x 480
 		AppConfig.setConfig(false);
-		//MapActions ma = new MapActions(srcMapPath+"p1.png");		
+		//ViewMap ma = new ViewMap(srcMapPath+"p1.png");		
 	
 		 try {     
-			 BufferedImage image = ImageIO.read(new File(srcMapPath+"p2.png"));
-			 int column = image.getWidth(null)/AppConfig.mapWidth;			
-	    	 int row = image.getHeight(null)/AppConfig.mapHeight; 
+			 BufferedImage image = ImageIO.read(new File(srcMapPath+"p12.png"));
+			 int column = image.getWidth(null)/AppConfig.partMapWidth;			
+	    	 int row = image.getHeight(null)/AppConfig.partMapHeight; 
 	         if (AppConfig.isDEBUG()){
 	        	 Log.getTRACE().debug("column=" +column); 
 	        	 Log.getTRACE().debug("row= "+row); 
 	        	 }
-	         int pos=45;
+	         int pos=0;
 	         for(int y = 0 ; y < row; y++) {
 	        	 pos++;
 	        	 Log.getDEBUG().debug("create "+AppConfig.mapsPath+"1_"+pos+"_x.png");
 	        	 for(int x = 0; x < column; x++ ) {               
-	        		 BufferedImage newImage = new BufferedImage(AppConfig.mapWidth, AppConfig.mapHeight, BufferedImage.TYPE_INT_ARGB);                	   		
-	        		 newImage.createGraphics().drawImage(image, x*(-AppConfig.mapWidth), y*(-AppConfig.mapHeight), null);            	             		
+	        		 BufferedImage newImage = new BufferedImage(AppConfig.partMapWidth, AppConfig.partMapHeight, BufferedImage.TYPE_INT_ARGB);                	   		
+	        		 newImage.createGraphics().drawImage(image, x*(-AppConfig.partMapWidth), y*(-AppConfig.partMapHeight), null);            	             		
 	        		 ImageIO.write(newImage, "png", new File(AppConfig.mapsPath+"1_"+pos+"_"+x+".png")); 
 	        		 if (AppConfig.isDEBUG()) 
 	        			 Log.getDEBUG().debug("create "+AppConfig.mapsPath+"1_"+pos+"_"+x+".png");
