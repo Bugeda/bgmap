@@ -70,7 +70,7 @@ public class Map {
 	}
 
 	public static boolean isScrollable(Point point) {
-		//ViewMap.impanel.offset=new Point(0,0);
+		//ViewMapTest.impanel.offset=new Point(0,0);
 
 		return true;
 	}

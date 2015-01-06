@@ -17,7 +17,7 @@ public class Divide {
 		//29120 x 43680   
 		//320 x 480
 		AppConfig.setConfig(false);
-		//ViewMap ma = new ViewMap(srcMapPath+"p1.png");		
+		//ViewMapTest ma = new ViewMapTest(srcMapPath+"p1.png");		
 	
 		 try {     
 			 BufferedImage image = ImageIO.read(new File(srcMapPath+"p22.png"));

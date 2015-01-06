@@ -1,12 +1,15 @@
 package bgmap.core;
 
 import java.awt.Cursor;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import javax.swing.event.MouseInputListener;
+
+import org.eclipse.swt.events.TypedEvent;
 
 import bgmap.core.entity.Map;
 
@@ -25,8 +28,9 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 	 
     @Override
     public void mousePressed(MouseEvent e) {
+		System.out.println("click="+e.getPoint());
     //    if (e.getButton()==MouseEvent.BUTTON1)
-      //		ViewMap.slider.setValue(100);
+      //		ViewMapTest.slider.setValue(100);
      	ViewMap.impanel.setMoveFrom(e.getPoint());         
         ViewMap.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
     }
@@ -34,10 +38,12 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
     @Override
     public void mouseReleased(MouseEvent e) {        	
     	if (ViewMap.impanel.startPoint !=null){
-            ViewMap.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            if (e.getButton()==MouseEvent.BUTTON1)        		
-				ViewMap.addPartsMap(e.getPoint());
+    		ViewMap.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+             if (e.getButton()==MouseEvent.BUTTON1)      {  		
+				ViewMap.addPartsMap();
+            }
     		ViewMap.impanel.startPoint = null;
+    		ViewMap.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     	}    		     		
     }
 
@@ -49,19 +55,29 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
     }
 
 	@Override
-	public void mouseMoved(MouseEvent arg0) {	
+	public void mouseMoved(MouseEvent e) {	
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent arg0) {
+	public void mouseClicked(MouseEvent e) {
+	
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent arg0) {
+	public void mouseEntered(MouseEvent e) {
 	}
 
 	@Override
-	public void mouseExited(MouseEvent arg0) {
-	}
-
+	public void mouseExited(MouseEvent e) {
+		//System.out.println();
+    	if (ViewMap.impanel.startPoint !=null){
+    		ViewMap.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    		 if (e.getModifiers() == MouseEvent.BUTTON1_MASK) {  		
+				ViewMap.addPartsMap();
+            }
+    		ViewMap.impanel.startPoint = null;
+    		ViewMap.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    	}    		     		
+    }
+		 
 }
