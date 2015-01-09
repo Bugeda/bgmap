@@ -16,7 +16,7 @@ public class ViewMapTest {
 	@Test
 	public void testRightDown() throws IOException {
 		AppConfig.setConfig(true);	
-		ViewMap.Run((byte)1,(byte)50,(byte)23);	
+		ViewMap.createAndShowGUI((byte)1,(byte)50,(byte)23);	
 		ViewMap.impanel.setMoveFrom(new Point(2000, 500));
 		ViewMap.impanel.setMoveTo(new Point(2100, 500));
 		ViewMap.impanel.startPoint = null;

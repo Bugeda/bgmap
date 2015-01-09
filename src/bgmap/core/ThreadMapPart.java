@@ -4,16 +4,15 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.util.concurrent.Callable;
 
 import bgmap.core.entity.Map;
 
-public class readMapPart implements Runnable {	 
+public class ThreadMapPart implements Runnable {	 
 	 private byte dx, dy;	 
 	 private byte x, y;	 
 	 private int drawX, drawY;	 
 	 
-     public readMapPart(byte dx, byte dy, byte x, byte y, int drawX, int drawY) {
+     public ThreadMapPart(byte dx, byte dy, byte x, byte y, int drawX, int drawY) {
       this.dx=dx;
       this.dy=dy;
       this.x = x;
@@ -35,8 +34,7 @@ public class readMapPart implements Runnable {
 		map.flush();
 		ViewMap.impanel.loadImage(Map.getImage());
 		g.dispose();
-		ViewMap.impanel.repaint();
-		
+		ViewMap.impanel.repaint();	
 	}
 
 }

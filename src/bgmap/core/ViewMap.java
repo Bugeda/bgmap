@@ -48,10 +48,10 @@ public class ViewMap {
 	            for(byte y=0; y < rowCount; y++ ) {        
 	            	dx=startColumn;
 	            	for(byte x=0; x < columnCount; x ++ ) { 
-	            		Runnable r = new readMapPart(dx, dy, x, y, drawX, drawY );
+	            		Runnable r = new ThreadMapPart(dx, dy, x, y, drawX, drawY);
 	            		Thread t = new Thread(r);
-	            		t.setPriority(3);
-	            		t.start();	            		
+	            		t.setPriority(t.MAX_PRIORITY);
+	            		t.start();	      
 	            		dx++;
 	                }
 	            	dy++;
@@ -66,7 +66,6 @@ public class ViewMap {
 	 * @return Image
 	 */	
 	private static Image createMap(byte scale, byte startColumn, byte startRow) {	
-		System.out.println("create map");
 		startColumn-=Map.COL_COUNT;
 		startRow-=Map.ROW_COUNT;
 		Image im = new BufferedImage(Map.partMapWidth * Map.COL_COUNT,Map.partMapHeight * Map.ROW_COUNT, BufferedImage.TYPE_INT_RGB);
@@ -102,14 +101,12 @@ public class ViewMap {
 	        } 
 		return im; 
     }
-	/**Redraw map and scroll it 
-	 * 
-	 * 
+	/**
+	 * Redraw map and scroll it 
 	 */
-	public static void addPartsMap(){
+	public static void paintMap(){
 		if ((impanel.offset.x!=0)||(impanel.offset.y!=0)){
-			Image newImage = new BufferedImage(Map.getSize().width,Map.getSize().height, BufferedImage.TYPE_INT_RGB);
-			
+			Image newImage = new BufferedImage(Map.getSize().width,Map.getSize().height, BufferedImage.TYPE_INT_RGB);			
 			Image subImage = ((BufferedImage) Map.getImage()).getSubimage(0, 0, Map.getSize().width,Map.getSize().height);
 			Graphics g = newImage.getGraphics();
 			g.drawImage(subImage, (int)(impanel.offset.x), (int)(impanel.offset.y), null);
@@ -163,7 +160,7 @@ public class ViewMap {
 			byte leftTopCol = (byte) (startCol + extraCols - 1);
 			byte topLeftRow = (byte) (startRow + extraRows - 1);
 			
-			if (AppConfig.isDEBUG()){
+			/*if (AppConfig.isDEBUG()){
 				System.out.println(impanel.offset);
 	    		System.out.println("Map.getStart "+Map.getStartCol()+","+Map.getStartRow());
 	    		System.out.println("Map.getMapoffset "+Map.getMapOffset()); 
@@ -181,7 +178,7 @@ public class ViewMap {
 	    		System.out.println("rightCol=" +  rightCol+ " downRow=" + downRow);	
 	    		System.out.println("COUNT" +  Map.COL_COUNT+ "," + Map.ROW_COUNT);
 	    		System.out.println("lefttopCorner = " +  leftTopCol+ "," + topLeftRow);
-			}
+			}*/
 		//	Image pimage  = null;
 			g.setColor(new Color(200,0,0,50));			
 			//paint left side
@@ -208,19 +205,14 @@ public class ViewMap {
 						(byte) (leftTopCol), (byte) (topLeftRow + Map.ROW_COUNT - (1 + addRowCount)*downRow), (byte) (Map.COL_COUNT + 1), (byte) (Math.abs(addRowCount)), 
 						leftPartCellWidth, Map.getSize().height - hRows + downPartCellHeight);										
 			}
-			//+1 becouse start col row must be full cell
+			//+1 becouse start col/row must be full cell
 			Map.setStartCol((byte) (leftTopCol + 1));
 			Map.setStartRow((byte) (topLeftRow + 1));
-			if (AppConfig.isDEBUG())
-				AppConfig.lgTRACE.debug("Map.getStart after "+Map.getStartCol()+","+Map.getStartRow()); 	
+		/*	if (AppConfig.isDEBUG())
+				AppConfig.lgTRACE.debug("Map.getStart after "+Map.getStartCol()+","+Map.getStartRow()); 	*/
 			Map.setMapOffset(new Point(rightPartCellWidth,downPartCellHeight));
-			//Map.setImage(newImage);		
-			
-		//	impanel.loadImage(newImage);
-			//g.dispose();
 	
 		}
-	
 	}	
 
 	
@@ -234,17 +226,13 @@ public class ViewMap {
         slider.setPaintTicks(true);  
         slider.setPaintLabels(true);
         slider.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        slider.setDoubleBuffered(false);
-        //slider.setLabelTable(null);         
+        slider.setDoubleBuffered(false);     
     }  
 	
 	
 	private static void createFrame(){		
 		JFrame f = new JFrame();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		
-	//	impanel.setAutoscrolls(true);
-    	//impanel.setMoveFrom(new Point(0,0));
-		//impanel.setMoveTo(new Point((-Math.abs(Map.getImage().getWidth(null))/2),-Math.abs((AppConfig.appHeight-Map.getImage().getHeight(null)+30)/2)));
 		f.getContentPane().add(new JScrollPane(impanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
 													 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));	
 		createSlider();   
@@ -258,7 +246,6 @@ public class ViewMap {
 		f.setSize(AppConfig.appWidth, AppConfig.appHeight); 
 		f.setBackground(Color.gray);
 		f.setResizable(false);
-		//setLocation(1,1);          
 		f.setVisible(true);		
 	}
 		
@@ -267,9 +254,8 @@ public class ViewMap {
 	 * Starts with scale, from (x, y) map parts
 	 * @throws IOException
 	 */
-	public static void Run(byte scale, byte x, byte y) throws IOException{	
+	public static void createAndShowGUI(byte scale, byte x, byte y) throws IOException{	
 		impanel = new ImagePanel(createMap(scale, x, y));	
-		//impanel = new ImagePanel(createMap(scale, x, y, (byte)20,(byte) 20));
 		createFrame();		
 	}
 	/**
@@ -277,10 +263,8 @@ public class ViewMap {
 	 * Starts with scale=1, from (1, 1) map parts
 	 * @throws IOException
 	 */
-	public static void Run() throws IOException{			
+	public static void createAndShowGUI() throws IOException{			
 		impanel = new ImagePanel(createMap((byte)1,(byte)1,(byte)1));	
-		//impanel = new ImagePanel(createMap((byte)1,(byte)1,(byte)1, (byte)50,(byte)50));
-		//impanel = new ImagePanel(createMap(1,1,8,3));
 		createFrame();		
 	}	
 	
@@ -289,7 +273,7 @@ public class ViewMap {
 	 * Starts with scale=1
 	 * @throws IOException
 	 */
-	public static void Run(String source) throws IOException{		
+	public static void createAndShowGUI(String source) throws IOException{		
 		Map.setPngScale((byte) 1);
 		impanel = new ImagePanel(source);	
 		createFrame();		

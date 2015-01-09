@@ -28,7 +28,6 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 	 
     @Override
     public void mousePressed(MouseEvent e) {
-		System.out.println("click="+e.getPoint());
     //    if (e.getButton()==MouseEvent.BUTTON1)
       //		ViewMapTest.slider.setValue(100);
      	ViewMap.impanel.setMoveFrom(e.getPoint());         
@@ -40,7 +39,7 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
     	if (ViewMap.impanel.startPoint !=null){
     		ViewMap.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
              if (e.getButton()==MouseEvent.BUTTON1)      {  		
-				ViewMap.addPartsMap();
+				ViewMap.paintMap();
             }
     		ViewMap.impanel.startPoint = null;
     		ViewMap.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -69,11 +68,10 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		//System.out.println();
     	if (ViewMap.impanel.startPoint !=null){
     		ViewMap.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     		 if (e.getModifiers() == MouseEvent.BUTTON1_MASK) {  		
-				ViewMap.addPartsMap();
+				ViewMap.paintMap();			
             }
     		ViewMap.impanel.startPoint = null;
     		ViewMap.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
