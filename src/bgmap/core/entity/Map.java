@@ -14,14 +14,14 @@ public class Map {
 	public static final int partMapHeight = 480;
 	public static final byte COL_COUNT=(byte) (AppConfig.appWidth*3 / Map.partMapWidth+2);
 	public static final byte ROW_COUNT=(byte) (AppConfig.appHeight*3 / Map.partMapHeight+2);
-	
+		
 	private static Image image;  	
 	private static byte startRow = 1;	
 	private static byte startCol = 1;    
 	private static byte pngScale = 1;
 	private static Point mapOffset;
 	private static Dimension size;
-	
+		
 	public static Image getImage() {
 		return image;
 	}

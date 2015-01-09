@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -52,12 +53,13 @@ public class ViewMap {
 	    		byte dy=startRow;    		
 	            for(byte y=0; y < rowCount; y++ ) {        
 	            	dx=startColumn;
-	            	for(byte x=0; x < columnCount; x ++ ) { 	            		           		
-	            		image = ImageIO.read(new File(getPartMapUrl(dy,dx)));	            		
+	            	for(byte x=0; x < columnCount; x ++ ) { 	
+	            	
+	            		image = new javax.swing.ImageIcon(ViewMap.getPartMapUrl(dy,dx)).getImage();            		
 	            		//image = new ImageIcon(getPartMapUrl(dy,dx)).getImage();
 	            		//FileInputStream fis = new FileInputStream(new File(getPartMapUrl(dy,dx)));
 	            		//image = ImageIO.read(fis);
-	            	   // image = Toolkit.getDefaultToolkit().getImage(getPartMapUrl(dy,dx));
+	            	    //image = Toolkit.getDefaultToolkit().getImage(getPartMapUrl(dy,dx));
 	                    g.drawImage(image, x * Map.partMapWidth, y * Map.partMapHeight, null);
 	            		g.drawRect(x * Map.partMapWidth, y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);
 	            	
@@ -99,11 +101,30 @@ public class ViewMap {
 	 */
 	public static void addPartsMap(){
 		if ((impanel.offset.x!=0)||(impanel.offset.y!=0)){
+			  //Создание потока
+	   /*     Thread myThready = new Thread(new Runnable()
+	        {
+	            public void run() //Этот метод будет выполняться в побочном потоке
+	            {*/
 			Image newImage = new BufferedImage(Map.getSize().width,Map.getSize().height, BufferedImage.TYPE_INT_RGB);
+			
 			Image subImage = ((BufferedImage) Map.getImage()).getSubimage(0, 0, Map.getSize().width,Map.getSize().height);
 			Graphics g = newImage.getGraphics();
 			g.drawImage(subImage, (int)(impanel.offset.x), (int)(impanel.offset.y), null);
-			/* right/down
+			
+			// absolute new coordinates for lefttop full cell 
+			int x =  impanel.offset.x + Map.getMapOffset().x;	
+			int y = impanel.offset.y + Map.getMapOffset().y;
+			
+			//  signX, signY use when we need calculate absolute left or right side from result position
+			//  signMoveX, signMoveY use when we need calculate just mouse move
+			byte signX = (byte) (x > 0 ? 1 : 0);	
+			byte signMoveX = (byte) (impanel.offset.x > 0 ? 1 : 0);	
+			byte signY = (byte) (y > 0 ? 1 : 0);	
+			byte signMoveY = (byte) (impanel.offset.y > 0 ? 1 : 0);	
+			
+			/* Calculate coordinates and parts of one cell at axes
+			 * right/down
 			 * dx = 0, ax = 0 => Map.partMapWidth
 			 * dx = -, ax = 0 => Map.partMapWidth - abs(dx)
 			 * dx = +. ax = 1 => dx
@@ -111,38 +132,34 @@ public class ViewMap {
 			 * dx = 0, ax = 0 => 0
 			 * dx = -, ax = 0 => - abs(dx)
 			 * dx = +. ax = 1 => dx - Map.partMapWidth
-			 * 
-			 *  signX, signY use when we need calculate absolute left or right side from result position
-			 *  signMoveX, signMoveY we use when we need calculate just mouse move
-			 */			
-		
-			int x =  impanel.offset.x + Map.getMapOffset().x;				
-			byte signX = (byte) (x > 0 ? 1 : 0);	
-			byte signMoveX = (byte) (impanel.offset.x > 0 ? 1 : 0);	
-			
+			 */								
 			int dx = x % Map.partMapWidth;		
 			int rightPartCellWidth =(Map.partMapWidth) * (1 - signX) + dx ;
 			int leftPartCellWidth = rightPartCellWidth - Map.partMapWidth;
-			
-			byte extraCols = (byte) (dx > 0 ? 1 : dx < 0 ? -1 : 0);
-			byte rightCol = (byte) (signX - 1);
-			byte addColCount = (byte) (x / Map.partMapWidth + extraCols + rightCol);
-			byte startCol = (byte) (Map.getStartCol() - addColCount);
-			int wCols = Math.abs(Map.partMapWidth * addColCount);	
-			
-			int y = impanel.offset.y + Map.getMapOffset().y;	
-			byte signY = (byte) (y > 0 ? 1 : 0);	
-			byte signMoveY = (byte) (impanel.offset.y > 0 ? 1 : 0);	
 			
 			int dy =  y % Map.partMapHeight;
 			int downPartCellHeight = (Map.partMapHeight) * (1 - signY ) + dy;
 			int upPartCellHeight = downPartCellHeight - Map.partMapHeight;
 			
+			//extra used for change picture when x/y < one cell
+			byte extraCols = (byte) (dx > 0 ? 1 : dx < 0 ? -1 : 0);
 			byte extraRows = (byte) (dy > 0 ? 1 : dy < 0 ? -1 : 0);
-			byte downRow = (byte) (signY - 1);
+			
+			// rightCol downRow used for correct col/row count on right/down sides
+			byte rightCol = (byte) (signX - 1);
+			byte downRow = (byte) (signY - 1);			
+			
+			byte addColCount = (byte) (x / Map.partMapWidth + extraCols + rightCol);
+			byte startCol = (byte) (Map.getStartCol() - addColCount);
+			int wCols = Math.abs(Map.partMapWidth * addColCount);			
 			byte addRowCount = (byte) (y / Map.partMapHeight + extraRows + downRow); 
 			byte startRow = (byte) (Map.getStartRow() - addRowCount);					
 			int hRows = Math.abs(Map.partMapHeight * addRowCount);
+			
+			//not full left top corner
+			byte leftTopCol = (byte) (startCol + extraCols - 1);
+			byte topLeftRow = (byte) (startRow + extraRows - 1);
+			
 			if (AppConfig.isDEBUG()){
 				System.out.println(impanel.offset);
 	    		System.out.println("Map.getStart "+Map.getStartCol()+","+Map.getStartRow());
@@ -160,35 +177,37 @@ public class ViewMap {
 	    		System.out.println("extra=" +  extraCols+ "," + extraRows);
 	    		System.out.println("rightCol=" +  rightCol+ " downRow=" + downRow);	
 	    		System.out.println("COUNT" +  Map.COL_COUNT+ "," + Map.ROW_COUNT);
+	    		System.out.println("lefttopCorner = " +  leftTopCol+ "," + topLeftRow);
 			}
-			g.setColor(new Color(255,0,0,50));
+			
+			g.setColor(new Color(200,0,0,50));			
 			//paint left side
 			if (signMoveX > 0){		
-				Image pimage = loadPartsMap(Map.getPngScale(), (byte) (startCol), (byte) (startRow + addRowCount + signMoveY - signY), (byte) (Math.abs(addColCount)), (byte) (Map.ROW_COUNT));				
-				g.drawImage(pimage, leftPartCellWidth, upPartCellHeight+hRows*(signMoveY), null);							
+				Image pimage = loadPartsMap(Map.getPngScale(), (byte) (leftTopCol), (byte) (topLeftRow + addRowCount*signMoveY), (byte) (Math.abs(addColCount)), (byte) (Map.ROW_COUNT));				
+				g.drawImage(pimage, leftPartCellWidth, upPartCellHeight+hRows*(signMoveY), null);		
 				pimage.flush();	
 			} 
 			//paint right side
 			else {										
-				Image pimage = loadPartsMap(Map.getPngScale(), (byte) (startCol - 1 + (Map.COL_COUNT + addColCount)), (byte) (startRow + addRowCount + signMoveY - signY), (byte) (Math.abs(addColCount)), (byte) (Map.ROW_COUNT));
+				Image pimage = loadPartsMap(Map.getPngScale(), (byte) (leftTopCol + Map.COL_COUNT + 1  + addColCount), (byte) (topLeftRow  + addRowCount*signMoveY), (byte) (Math.abs(addColCount)), (byte) (Map.ROW_COUNT));
 				g.drawImage(pimage,Map.getSize().width - wCols + rightPartCellWidth, upPartCellHeight + hRows * (signMoveY), null);
 				pimage.flush();			
 			}  
 			//paint top side
 			if (signMoveY > 0){					
-				Image pimage = loadPartsMap(Map.getPngScale(), (byte) (startCol - 1 + extraCols), (byte) (startRow),(byte) (Map.COL_COUNT + 1),  (byte) (Math.abs(addRowCount)) );				
-				g.drawImage(pimage, leftPartCellWidth, upPartCellHeight, null);				
+				Image pimage = loadPartsMap(Map.getPngScale(), (byte) (leftTopCol), (byte) (topLeftRow),(byte) (Map.COL_COUNT + 1),  (byte) (Math.abs(addRowCount)) );				
+				g.drawImage(pimage, leftPartCellWidth, upPartCellHeight, null);	
 				pimage.flush();	
 			} 
 			//paint down side
 			else{		
-				Image pimage = loadPartsMap(Map.getPngScale(), (byte) (startCol - 1 + extraCols), (byte) (startRow - 1 + (Map.ROW_COUNT + addRowCount)), (byte) (Map.COL_COUNT + 1), (byte) (Math.abs(addRowCount)));
+				Image pimage = loadPartsMap(Map.getPngScale(), (byte) (leftTopCol), (byte) (topLeftRow + Map.ROW_COUNT + 1 + addRowCount), (byte) (Map.COL_COUNT + 1), (byte) (Math.abs(addRowCount)));
 				g.drawImage(pimage, leftPartCellWidth, Map.getSize().height - hRows + downPartCellHeight, null);			
 				pimage.flush();											
 			}
 			//+1 becouse start col row must be full cell
-			Map.setStartCol((byte) (startCol + extraCols));
-			Map.setStartRow((byte) (startRow + extraRows));
+			Map.setStartCol((byte) (leftTopCol + 1));
+			Map.setStartRow((byte) (topLeftRow + 1));
 			if (AppConfig.isDEBUG())
 				AppConfig.lgTRACE.debug("Map.getStart after "+Map.getStartCol()+","+Map.getStartRow()); 	
 			Map.setMapOffset(new Point(rightPartCellWidth,downPartCellHeight));
@@ -197,6 +216,10 @@ public class ViewMap {
 			impanel.loadImage(newImage);
 			g.dispose();
 			impanel.repaint();
+	   /*         }
+	        });
+	        myThready.setPriority(3);	        
+	        myThready.start();	//Запуск потока*/
 		}
 	
 	}	
@@ -219,10 +242,7 @@ public class ViewMap {
 	private static void createFrame(){		
 		JFrame f = new JFrame();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		
-	//	impanel.setAutoscrolls(true);
-    	//impanel.setMoveFrom(new Point(0,0));
-		//impanel.setMoveTo(new Point((-Math.abs(Map.getImage().getWidth(null))/2),-Math.abs((AppConfig.appHeight-Map.getImage().getHeight(null)+30)/2)));
-		f.getContentPane().add(new JScrollPane(impanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
+     	f.getContentPane().add(new JScrollPane(impanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
 													 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));	
 		createSlider();   
 		f.getContentPane().add(slider, "East");		
