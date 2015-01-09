@@ -6,8 +6,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -18,14 +18,13 @@ import javax.swing.event.*;
 import bgmap.core.entity.*;
 
 public class ViewMap {		
-	
 	static final byte MAX_scale = 127;
 	static final byte MIN_scale = 4;
 	static final byte START_scale = 100;	
 	static final byte CAPTION_HEIGHT=25;
 	public static ImagePanel impanel;
 	public static JSlider slider;
-
+    static Image imageArea;
     MapMouseAdapter movingAdapt = new MapMouseAdapter();
 	
 	/**
@@ -33,49 +32,30 @@ public class ViewMap {
 	 * @param x
 	 * @return url to png file with part of map
 	 */
-	private static String getPartMapUrl(byte y, byte x){
+	static String getPartMapUrl(byte y, byte x){
 		return AppConfig.mapsPath+Map.getPngScale() + "_" + y + "_" + x + ".png";
 	}
 	/**
 	 * Load map from parts with size (column,row)
 	 * with coordinates from (startColumn, startRow)
 	 * and scale.
+	 * @return 
 	 * @return Image
 	 */
-	private static Image loadPartsMap(byte scale, byte startColumn, byte startRow, byte columnCount, byte rowCount){
-		Image im = new BufferedImage(Map.partMapWidth * columnCount,Map.partMapHeight * rowCount, BufferedImage.TYPE_INT_RGB);
-		Graphics g = im.getGraphics();
-		g.setColor(Color.BLACK);
-		g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 40));
-		try {        				 
-	        	Image image = null;		        	
-	    		byte dx;
+	private static void loadPartsMap(byte scale, byte startColumn, byte startRow, byte columnCount, byte rowCount, int drawX, int drawY){
+				byte dx;
 	    		byte dy=startRow;    		
 	            for(byte y=0; y < rowCount; y++ ) {        
 	            	dx=startColumn;
-	            	for(byte x=0; x < columnCount; x ++ ) { 	
-	            	
-	            		image = new javax.swing.ImageIcon(ViewMap.getPartMapUrl(dy,dx)).getImage();            		
-	            		//image = new ImageIcon(getPartMapUrl(dy,dx)).getImage();
-	            		//FileInputStream fis = new FileInputStream(new File(getPartMapUrl(dy,dx)));
-	            		//image = ImageIO.read(fis);
-	            	    //image = Toolkit.getDefaultToolkit().getImage(getPartMapUrl(dy,dx));
-	                    g.drawImage(image, x * Map.partMapWidth, y * Map.partMapHeight, null);
-	            		g.drawRect(x * Map.partMapWidth, y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);
-	            	
-	            		g.drawString(dy+" "+dx, x* Map.partMapWidth+150, y* Map.partMapHeight+200);
-	            		image.flush();
+	            	for(byte x=0; x < columnCount; x ++ ) { 
+	            		Runnable r = new readMapPart(dx, dy, x, y, drawX, drawY );
+	            		Thread t = new Thread(r);
+	            		t.setPriority(3);
+	            		t.start();	            		
 	            		dx++;
 	                }
 	            	dy++;
-	            }        	        
-	            g.dispose();
-	        } catch (Exception e) {
-	    		AppConfig.lgTRACE.error(e);
-	            AppConfig.lgWARN.error(e);
-	            System.exit(1);	 
-	        }        
-		 return im;
+	            }        	  	
 	}
 	
 	/**
@@ -85,32 +65,55 @@ public class ViewMap {
 	 * Save link to the image in Map.class
 	 * @return Image
 	 */	
-	private static Image createMap(byte scale, byte startColumn, byte startRow) {		
+	private static Image createMap(byte scale, byte startColumn, byte startRow) {	
+		System.out.println("create map");
 		startColumn-=Map.COL_COUNT;
 		startRow-=Map.ROW_COUNT;
-	    Image im = loadPartsMap(scale,startColumn,startRow,Map.COL_COUNT,Map.ROW_COUNT);
-    	Map.setImage(im);     
-		Map.setPngScale(scale);
-        Map.setStartCol(startColumn);
-        Map.setStartRow(startRow);                
-        return im;
+		Image im = new BufferedImage(Map.partMapWidth * Map.COL_COUNT,Map.partMapHeight * Map.ROW_COUNT, BufferedImage.TYPE_INT_RGB);
+		Graphics g = im.getGraphics();
+		g.setColor(Color.BLACK);
+		g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 40));
+		try {        				 
+	        	Image image = null;		        	
+	    		byte dx;
+	    		byte dy=startRow;    		
+	            for(byte y=0; y < Map.ROW_COUNT; y++ ) {        
+	            	dx=startColumn;
+	            	for(byte x=0; x < Map.COL_COUNT; x ++ ) { 		            	
+	            		image = new javax.swing.ImageIcon(ViewMap.getPartMapUrl(dy,dx)).getImage();            		
+	                    g.drawImage(image, x * Map.partMapWidth, y * Map.partMapHeight, null);
+	            		g.drawRect(x * Map.partMapWidth, y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);	            	
+	            		g.drawString(dy+" "+dx, x* Map.partMapWidth+150, y* Map.partMapHeight+200);
+	            		image.flush();
+	            		dx++;
+	                }
+	            	dy++;
+	            }        	        
+	            g.dispose();
+	        	Map.setImage(im);     
+	    		Map.setPngScale(scale);
+	            Map.setStartCol(startColumn);
+	            Map.setStartRow(startRow); 
+	            
+	        } catch (Exception e) {
+	    		AppConfig.lgTRACE.error(e);
+	            AppConfig.lgWARN.error(e);
+	            System.exit(1);	 
+	        } 
+		return im; 
     }
 	/**Redraw map and scroll it 
-	 * @throws IOException 
+	 * 
 	 * 
 	 */
 	public static void addPartsMap(){
 		if ((impanel.offset.x!=0)||(impanel.offset.y!=0)){
-			  //Создание потока
-	   /*     Thread myThready = new Thread(new Runnable()
-	        {
-	            public void run() //Этот метод будет выполняться в побочном потоке
-	            {*/
 			Image newImage = new BufferedImage(Map.getSize().width,Map.getSize().height, BufferedImage.TYPE_INT_RGB);
 			
 			Image subImage = ((BufferedImage) Map.getImage()).getSubimage(0, 0, Map.getSize().width,Map.getSize().height);
 			Graphics g = newImage.getGraphics();
 			g.drawImage(subImage, (int)(impanel.offset.x), (int)(impanel.offset.y), null);
+			Map.setImage(newImage);
 			
 			// absolute new coordinates for lefttop full cell 
 			int x =  impanel.offset.x + Map.getMapOffset().x;	
@@ -179,31 +182,31 @@ public class ViewMap {
 	    		System.out.println("COUNT" +  Map.COL_COUNT+ "," + Map.ROW_COUNT);
 	    		System.out.println("lefttopCorner = " +  leftTopCol+ "," + topLeftRow);
 			}
-			
+		//	Image pimage  = null;
 			g.setColor(new Color(200,0,0,50));			
 			//paint left side
 			if (signMoveX > 0){		
-				Image pimage = loadPartsMap(Map.getPngScale(), (byte) (leftTopCol), (byte) (topLeftRow + addRowCount*signMoveY), (byte) (Math.abs(addColCount)), (byte) (Map.ROW_COUNT));				
-				g.drawImage(pimage, leftPartCellWidth, upPartCellHeight+hRows*(signMoveY), null);		
-				pimage.flush();	
+				loadPartsMap(Map.getPngScale(), 
+						(byte) (leftTopCol), (byte) (topLeftRow + addRowCount*signMoveY), (byte) (Math.abs(addColCount)), (byte) (Map.ROW_COUNT), 
+						leftPartCellWidth,upPartCellHeight+hRows*(signMoveY));				
 			} 
 			//paint right side
 			else {										
-				Image pimage = loadPartsMap(Map.getPngScale(), (byte) (leftTopCol + Map.COL_COUNT + 1  + addColCount), (byte) (topLeftRow  + addRowCount*signMoveY), (byte) (Math.abs(addColCount)), (byte) (Map.ROW_COUNT));
-				g.drawImage(pimage,Map.getSize().width - wCols + rightPartCellWidth, upPartCellHeight + hRows * (signMoveY), null);
-				pimage.flush();			
+				loadPartsMap(Map.getPngScale(), 
+						(byte) (leftTopCol + Map.COL_COUNT - (1  + addColCount)*rightCol), (byte) (topLeftRow  + addRowCount*signMoveY), (byte) (Math.abs(addColCount)), (byte) (Map.ROW_COUNT), 
+						Map.getSize().width - wCols + rightPartCellWidth, upPartCellHeight + hRows * (signMoveY));
 			}  
 			//paint top side
 			if (signMoveY > 0){					
-				Image pimage = loadPartsMap(Map.getPngScale(), (byte) (leftTopCol), (byte) (topLeftRow),(byte) (Map.COL_COUNT + 1),  (byte) (Math.abs(addRowCount)) );				
-				g.drawImage(pimage, leftPartCellWidth, upPartCellHeight, null);	
-				pimage.flush();	
-			} 
+				loadPartsMap(Map.getPngScale(), 
+						(byte) (leftTopCol), (byte) (topLeftRow),(byte) (Map.COL_COUNT + 1),  (byte) (Math.abs(addRowCount)), 
+						leftPartCellWidth, upPartCellHeight);				
+			}
 			//paint down side
 			else{		
-				Image pimage = loadPartsMap(Map.getPngScale(), (byte) (leftTopCol), (byte) (topLeftRow + Map.ROW_COUNT + 1 + addRowCount), (byte) (Map.COL_COUNT + 1), (byte) (Math.abs(addRowCount)));
-				g.drawImage(pimage, leftPartCellWidth, Map.getSize().height - hRows + downPartCellHeight, null);			
-				pimage.flush();											
+				loadPartsMap(Map.getPngScale(), 
+						(byte) (leftTopCol), (byte) (topLeftRow + Map.ROW_COUNT - (1 + addRowCount)*downRow), (byte) (Map.COL_COUNT + 1), (byte) (Math.abs(addRowCount)), 
+						leftPartCellWidth, Map.getSize().height - hRows + downPartCellHeight);										
 			}
 			//+1 becouse start col row must be full cell
 			Map.setStartCol((byte) (leftTopCol + 1));
@@ -211,18 +214,15 @@ public class ViewMap {
 			if (AppConfig.isDEBUG())
 				AppConfig.lgTRACE.debug("Map.getStart after "+Map.getStartCol()+","+Map.getStartRow()); 	
 			Map.setMapOffset(new Point(rightPartCellWidth,downPartCellHeight));
-			Map.setImage(newImage);		
+			//Map.setImage(newImage);		
 			
-			impanel.loadImage(newImage);
-			g.dispose();
-			impanel.repaint();
-	   /*         }
-	        });
-	        myThready.setPriority(3);	        
-	        myThready.start();	//Запуск потока*/
+		//	impanel.loadImage(newImage);
+			//g.dispose();
+	
 		}
 	
 	}	
+
 	
 	/**
 	 * create slidebar
@@ -242,7 +242,10 @@ public class ViewMap {
 	private static void createFrame(){		
 		JFrame f = new JFrame();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		
-     	f.getContentPane().add(new JScrollPane(impanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
+	//	impanel.setAutoscrolls(true);
+    	//impanel.setMoveFrom(new Point(0,0));
+		//impanel.setMoveTo(new Point((-Math.abs(Map.getImage().getWidth(null))/2),-Math.abs((AppConfig.appHeight-Map.getImage().getHeight(null)+30)/2)));
+		f.getContentPane().add(new JScrollPane(impanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
 													 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));	
 		createSlider();   
 		f.getContentPane().add(slider, "East");		
@@ -274,8 +277,8 @@ public class ViewMap {
 	 * Starts with scale=1, from (1, 1) map parts
 	 * @throws IOException
 	 */
-	public static void Run() throws IOException{				
-		impanel = new ImagePanel(createMap((byte)1,(byte)1,(byte)1));		
+	public static void Run() throws IOException{			
+		impanel = new ImagePanel(createMap((byte)1,(byte)1,(byte)1));	
 		//impanel = new ImagePanel(createMap((byte)1,(byte)1,(byte)1, (byte)50,(byte)50));
 		//impanel = new ImagePanel(createMap(1,1,8,3));
 		createFrame();		
