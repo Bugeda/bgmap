@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
+import bgmap.admin.ViewApp;
 import bgmap.core.*;
 import bgmap.core.entity.Map;
 
@@ -16,12 +17,12 @@ public class ViewMapTest {
 	@Test
 	public void testRightDown() throws IOException {
 		AppConfig.setConfig(true);	
-		ViewMap.createAndShowGUI((byte)1,(byte)50,(byte)23);	
-		ViewMap.impanel.setMoveFrom(new Point(2000, 500));
-		ViewMap.impanel.setMoveTo(new Point(2100, 500));
-		ViewMap.impanel.startPoint = null;
+		ViewApp.createAndShowGUI((byte)1,(byte)50,(byte)23);	
+		ViewApp.impanel.setMoveFrom(new Point(2000, 500));
+		ViewApp.impanel.setMoveTo(new Point(2100, 500));
+		ViewApp.impanel.startPoint = null;
 		
-		int x = ViewMap.impanel.offset.x + Map.getMapOffset().x;
+		int x = ViewApp.impanel.offset.x + Map.getMapOffset().x;
 				
 		byte xAxis = (byte) (x > 0 ? -1 : 0);			
 		int dx = x % Map.partMapWidth;		
@@ -32,7 +33,7 @@ public class ViewMapTest {
 		byte startCol = (byte) (Map.getStartCol() - addColCount);
 		int wCols = Math.abs(Map.partMapWidth * addColCount);	
 		
-		int y = ViewMap.impanel.offset.y + Map.getMapOffset().y;	
+		int y = ViewApp.impanel.offset.y + Map.getMapOffset().y;	
 		byte yAxis = (byte) (y > 0 ? -1 : 0);	
 
 		int dy = y % Map.partMapHeight;			
@@ -54,12 +55,12 @@ public class ViewMapTest {
 		assertEquals(100, upPartCellHeight+hRows);	
 		assertEquals(7, Map.ROW_COUNT+Math.abs(addRowCount));
 		
-		ViewMap.impanel.setMoveFrom(new Point(2500, 2000));
-		ViewMap.impanel.setMoveTo(new Point(2700, 2100));
-		ViewMap.impanel.startPoint = null;
+		ViewApp.impanel.setMoveFrom(new Point(2500, 2000));
+		ViewApp.impanel.setMoveTo(new Point(2700, 2100));
+		ViewApp.impanel.startPoint = null;
 		
 		
-		x = ViewMap.impanel.offset.x + Map.getMapOffset().x;		
+		x = ViewApp.impanel.offset.x + Map.getMapOffset().x;		
 		xAxis = (byte) (x > 0 ? -1 : 0);			
 		dx = x % Map.partMapWidth;		
 		rightPartCellWidth = (Map.partMapWidth)*(xAxis + 1) + dx;
@@ -69,7 +70,7 @@ public class ViewMapTest {
 		startCol = (byte) (Map.getStartCol() - addColCount);
 		wCols = Math.abs(Map.partMapWidth * addColCount);	
 		
-		y = ViewMap.impanel.offset.y + Map.getMapOffset().y;	
+		y = ViewApp.impanel.offset.y + Map.getMapOffset().y;	
 		yAxis = (byte) (y > 0 ? -1 : 0);	
 
 		dy = y % Map.partMapHeight;			

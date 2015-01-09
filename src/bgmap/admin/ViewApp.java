@@ -1,4 +1,4 @@
-package bgmap.core;
+package bgmap.admin;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -15,24 +15,40 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import bgmap.core.AppConfig;
+import bgmap.core.ImagePanel;
+import bgmap.core.MapMouseAdapter;
+import bgmap.core.ThreadMapPart;
 import bgmap.core.entity.*;
 
-public class ViewMap {		
-	static final byte MAX_scale = 127;
-	static final byte MIN_scale = 4;
-	static final byte START_scale = 100;	
-	static final byte CAPTION_HEIGHT=25;
+public class ViewApp {		
+	public static final byte MAX_scale = 127;
+	public static final byte MIN_scale = 4;
+	public static final byte START_scale = 100;	
+	public static final byte CAPTION_HEIGHT=25;
 	public static ImagePanel impanel;
 	public static JSlider slider;
     static Image imageArea;
     MapMouseAdapter movingAdapt = new MapMouseAdapter();
 	
+    public static void main(String[] args) throws IOException{
+		AppConfig.setConfig(true);			
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	            public void run() {
+	            	try {
+						createAndShowGUI((byte)1,(byte)50,(byte)23);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+	            }
+	        });
+	}    
 	/**
 	 * @param y
 	 * @param x
 	 * @return url to png file with part of map
 	 */
-	static String getPartMapUrl(byte y, byte x){
+	public static String getPartMapUrl(byte y, byte x){
 		return AppConfig.mapsPath+Map.getPngScale() + "_" + y + "_" + x + ".png";
 	}
 	/**
@@ -79,7 +95,7 @@ public class ViewMap {
 	            for(byte y=0; y < Map.ROW_COUNT; y++ ) {        
 	            	dx=startColumn;
 	            	for(byte x=0; x < Map.COL_COUNT; x ++ ) { 		            	
-	            		image = new javax.swing.ImageIcon(ViewMap.getPartMapUrl(dy,dx)).getImage();            		
+	            		image = new javax.swing.ImageIcon(ViewApp.getPartMapUrl(dy,dx)).getImage();            		
 	                    g.drawImage(image, x * Map.partMapWidth, y * Map.partMapHeight, null);
 	            		g.drawRect(x * Map.partMapWidth, y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);	            	
 	            		g.drawString(dy+" "+dx, x* Map.partMapWidth+150, y* Map.partMapHeight+200);
@@ -236,6 +252,7 @@ public class ViewMap {
 		f.getContentPane().add(new JScrollPane(impanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
 													 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));	
 		createSlider();   
+		//f.getContentPane()
 		f.getContentPane().add(slider, "East");		
 		slider.addChangeListener(new ChangeListener() {  
 	            public void stateChanged(ChangeEvent e) {  

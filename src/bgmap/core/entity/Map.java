@@ -4,8 +4,8 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
 
+import bgmap.admin.ViewApp;
 import bgmap.core.AppConfig;
-import bgmap.core.ViewMap;
 
 public class Map {	
 	
