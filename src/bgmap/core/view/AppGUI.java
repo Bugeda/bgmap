@@ -1,4 +1,4 @@
-package bgmap.core;
+package bgmap.core.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -19,22 +19,23 @@ import java.util.HashSet;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import bgmap.core.entity.*;
+import bgmap.core.AdminPanelStatus;
+import bgmap.core.AppConfig;
+import bgmap.core.controller.MapMouseAdapter;
+import bgmap.core.model.*;
+import bgmap.core.model.dao.DBManager;
 
 public class AppGUI {		
-	static final byte MAX_scale = 127;
-	static final byte MIN_scale = 4;
-	static final byte START_scale = 100;	
-	static final byte CAPTION_HEIGHT=25;
-	protected static MapPanel impanel = null;
-	final protected static JSlider slider = new JSlider(JSlider.VERTICAL, MIN_scale, MAX_scale, START_scale);;
-	final protected static JFrame mainFrame = new JFrame("bgmap");
+	public static final byte MAX_scale = 127;
+	public static final byte MIN_scale = 4;
+	public static final byte START_scale = 100;	
+	public static final byte CAPTION_HEIGHT=25;
+	public static MapPanel mapPanel = null;
+	public final static JSlider slider = new JSlider(JSlider.VERTICAL, MIN_scale, MAX_scale, START_scale);;
+	public final static JFrame mainFrame = new JFrame("bgmap");
 	final protected static JLayeredPane workPanel = new JLayeredPane();
 	protected static JPanel adminPanel = null;	
 	protected static HashSet<Maf> mafs = new HashSet<Maf>(); 
-	protected static HashSet<MafPanel> mafPanels = new HashSet<MafPanel>(); 
-	
-    MapMouseAdapter movingAdapt = new MapMouseAdapter();
 	
 	/**
 	 * @param y
@@ -111,31 +112,29 @@ public class AppGUI {
 	    		Map.setPngScale(scale);
 	            Map.setStartCol(startColumn);
 	            Map.setStartRow(startRow); 
-
-	
 		return im; 
     }
 	/**
 	 * Redraw map and scroll it 
 	 */
 	public static void paintMap(){
-		if ((impanel.offset.x!=0)||(impanel.offset.y!=0)){
+		if ((mapPanel.offset.x!=0)||(mapPanel.offset.y!=0)){
 			Image newImage = new BufferedImage(Map.getSize().width,Map.getSize().height, BufferedImage.TYPE_INT_RGB);			
 			Image subImage = ((BufferedImage) Map.getImage()).getSubimage(0, 0, Map.getSize().width,Map.getSize().height);
 			Graphics g = newImage.getGraphics();
-			g.drawImage(subImage, (int)(impanel.offset.x), (int)(impanel.offset.y), null);
+			g.drawImage(subImage, (int)(mapPanel.offset.x), (int)(mapPanel.offset.y), null);
 			Map.setImage(newImage);
 			
 			// absolute new coordinates for lefttop full cell 
-			int x = impanel.offset.x + Map.getMapOffset().x;	
-			int y = impanel.offset.y + Map.getMapOffset().y;
+			int x = mapPanel.offset.x + Map.getMapOffset().x;	
+			int y = mapPanel.offset.y + Map.getMapOffset().y;
 			
 			//  signX, signY use when we need calculate absolute left or right side from result position
 			//  signMoveX, signMoveY use when we need calculate just mouse move
 			byte signX = (byte) (x > 0 ? 1 : 0);	
-			byte signMoveX = (byte) (impanel.offset.x > 0 ? 1 : 0);	
+			byte signMoveX = (byte) (mapPanel.offset.x > 0 ? 1 : 0);	
 			byte signY = (byte) (y > 0 ? 1 : 0);	
-			byte signMoveY = (byte) (impanel.offset.y > 0 ? 1 : 0);	
+			byte signMoveY = (byte) (mapPanel.offset.y > 0 ? 1 : 0);	
 			
 			/* Calculate coordinates and parts of one cell at axes
 			 * right/down
@@ -175,7 +174,7 @@ public class AppGUI {
 			byte topLeftRow = (byte) (startRow + extraRows - 1);
 			
 			/*if (AppConfig.isDEBUG()){
-				System.out.println(impanel.offset);
+				System.out.println(mapPanel.offset);
 	    		System.out.println("Map.getStart "+Map.getStartCol()+","+Map.getStartRow());
 	    		System.out.println("Map.getMapoffset "+Map.getMapOffset()); 
 	    		System.out.println("add "+addColCount+","+addRowCount); 	  	   
@@ -227,6 +226,20 @@ public class AppGUI {
 			Map.setMapOffset(new Point(rightPartCellWidth,downPartCellHeight));
 		}
 	}	
+	
+	
+	/**
+	 * paint maf
+	 */
+	
+	public static void paintMaf(Maf maf){			
+		Graphics g = Map.getImage().getGraphics();  		
+		g.setColor(Color.red);
+		g.fillOval(Map.getMapOffset().x+Map.partMapWidth*(maf.getColNum()-Map.getStartCol())+maf.getX(), Map.getMapOffset().y+Map.partMapHeight*(maf.getRowNum()-Map.getStartRow())+maf.getY(), 5, 5);
+		AppGUI.mapPanel.loadImage(Map.getImage());
+		g.dispose();
+		AppGUI.mapPanel.repaint();	
+	}
 	
 	/**
 	 * create slidebar

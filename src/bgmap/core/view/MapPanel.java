@@ -1,4 +1,4 @@
-package bgmap.core;
+package bgmap.core.view;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -7,8 +7,10 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import bgmap.core.entity.Maf;
-import bgmap.core.entity.Map;
+import bgmap.core.AppConfig;
+import bgmap.core.controller.MapMouseAdapter;
+import bgmap.core.model.Maf;
+import bgmap.core.model.Map;
 
 public class MapPanel extends JPanel {
 

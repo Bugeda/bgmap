@@ -1,11 +1,11 @@
-package bgmap.core;
+package bgmap.core.view;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 
-import bgmap.core.entity.Map;
+import bgmap.core.model.Map;
 
 public class ThreadMapPart implements Runnable {	 
 	 private byte dx, dy;	 
@@ -32,9 +32,9 @@ public class ThreadMapPart implements Runnable {
 		g.drawRect(drawX+x * Map.partMapWidth, drawY+y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);	
 		g.drawString(dy+" "+dx, drawX+x* Map.partMapWidth+150, drawY+y* Map.partMapHeight+200);				
 		map.flush();
-		AppGUI.impanel.loadImage(Map.getImage());
+		AppGUI.mapPanel.loadImage(Map.getImage());
 		g.dispose();
-		AppGUI.impanel.repaint();	
+		AppGUI.mapPanel.repaint();	
 	}
 
 }

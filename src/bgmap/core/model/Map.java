@@ -1,4 +1,4 @@
-package bgmap.core.entity;
+package bgmap.core.model;
 
 import java.awt.Dimension;
 import java.awt.Image;

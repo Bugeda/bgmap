@@ -1,9 +1,9 @@
-package bgmap.core;
+package bgmap.core.model.dao;
 
 import java.sql.*;
 import java.util.HashSet;
 
-import bgmap.core.entity.Maf;
+import bgmap.core.model.Maf;
 
 public class DBManager {
 	static final String JDBC_DRIVER = "org.sqlite.JDBC";

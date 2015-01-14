@@ -1,4 +1,4 @@
-package bgmap.core;
+package bgmap.core.controller;
 
 import java.awt.Cursor;
 import java.awt.MouseInfo;
@@ -9,8 +9,10 @@ import java.awt.event.MouseWheelListener;
 
 import javax.swing.event.MouseInputListener;
 
-import bgmap.core.entity.AdminPanelStatus;
-import bgmap.core.entity.Map;
+import bgmap.core.AdminPanelStatus;
+import bgmap.core.model.Map;
+import bgmap.core.view.AppGUI;
+import bgmap.core.view.MafEditor;
 
 public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener, MouseInputListener {
 		
@@ -29,26 +31,26 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
     public void mousePressed(MouseEvent e) {
         if (e.getButton()==MouseEvent.BUTTON1)
       		AppGUI.slider.setValue(100);
-     	AppGUI.impanel.setMoveFrom(e.getPoint());         
-        AppGUI.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+     	AppGUI.mapPanel.setMoveFrom(e.getPoint());         
+        AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {        	
-    	if (AppGUI.impanel.startPoint !=null){
-    		AppGUI.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    	if (AppGUI.mapPanel.startPoint !=null){
+    		AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
              if (e.getButton()==MouseEvent.BUTTON1)      {  		
 				AppGUI.paintMap();
             }
-    		AppGUI.impanel.startPoint = null;
-    		AppGUI.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            AppGUI.mapPanel.startPoint = null;
+    		AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     	}    		     		
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
     	if (Map.isScrollable(e.getPoint()))
-    		AppGUI.impanel.setMoveTo(e.getPoint());    	
+    		AppGUI.mapPanel.setMoveTo(e.getPoint());    	
     	else mouseReleased(e);    		
     }
 
@@ -58,7 +60,7 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		System.out.println("click="+e.getPoint()+","+AppGUI.impanel.getMousePosition());
+		System.out.println("click="+e.getPoint()+","+AppGUI.mapPanel.getMousePosition());
 		if (AdminPanelStatus.isAddMaf()){
 		     if (e.getButton()==MouseEvent.BUTTON1)
 		      		AppGUI.slider.setValue(100);
@@ -72,13 +74,13 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-    	if (AppGUI.impanel.startPoint !=null){
-    		AppGUI.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    	if (AppGUI.mapPanel.startPoint !=null){
+    		AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     		 if (e.getModifiers() == MouseEvent.BUTTON1_MASK) {  		
 				AppGUI.paintMap();			
             }
-    		AppGUI.impanel.startPoint = null;
-    		AppGUI.impanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    		AppGUI.mapPanel.startPoint = null;
+    		AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     	}    		     		
     }
 		 

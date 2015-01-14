@@ -1,4 +1,4 @@
-package bgmap.core.entity;
+package bgmap.core.model;
 
 /**
  * 1. полное наименование субъекта ведения хозяйства

@@ -1,7 +1,10 @@
 package bgmap.core;
 
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.Toolkit;
+
+import javax.swing.ImageIcon;
 
 import org.apache.log4j.*;
 
@@ -15,8 +18,9 @@ public class AppConfig {
 	
 	private static boolean WORKDEBUG = false;
 	
-	public static final String mapsPath = "src/images/maps/";
-		
+	final static public String mapsPath = "src/images/maps/";
+	final static public Image sign = new ImageIcon("src/images/src/home.png").getImage();
+	
 	public static final int appWidth = Toolkit.getDefaultToolkit().getScreenSize().width
 			- Toolkit.getDefaultToolkit().getScreenInsets(
 			GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration()

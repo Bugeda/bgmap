@@ -17,11 +17,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import bgmap.core.AppConfig;
-import bgmap.core.MafPanel;
-import bgmap.core.MapPanel;
-import bgmap.core.AppGUI;
-import bgmap.core.entity.Maf;
-import bgmap.core.entity.Map;
+import bgmap.core.model.Maf;
+import bgmap.core.model.Map;
+import bgmap.core.view.AppGUI;
+import bgmap.core.view.MapPanel;
 
 public class AdminGUI extends AppGUI {
 	public static void main(String[] args){
@@ -45,7 +44,7 @@ public class AdminGUI extends AppGUI {
 		
 		mainFrame.add(adminPanel, "North");
 		mainFrame.add(slider, "East");		
-		workPanel.add(AppGUI.impanel, 1, 0);	
+		workPanel.add(AppGUI.mapPanel, 1, 0);	
 		
 	
 		
@@ -55,19 +54,19 @@ public class AdminGUI extends AppGUI {
 		slider.addChangeListener(new ChangeListener() {  
 	            public void stateChanged(ChangeEvent e) {  
 	                int value = ((JSlider)e.getSource()).getValue();     
-	                impanel.setScale(value/100.0);	                	               
+	                mapPanel.setScale(value/100.0);	                	               
 	            }  
 	        });         		 
 		mainFrame.setVisible(true);	
 	
 		int h = AppGUI.adminPanel !=null ? AppGUI.adminPanel.getHeight() : 0;		
-		impanel.setSize(AppConfig.appWidth - AppGUI.slider.getWidth(), AppConfig.appHeight+h);
-		impanel.setLocation((int)(-AppGUI.mainFrame.getInsets().left - AppGUI.mainFrame.getOpacity()),
+		mapPanel.setSize(AppConfig.appWidth - AppGUI.slider.getWidth(), AppConfig.appHeight+h);
+		mapPanel.setLocation((int)(-AppGUI.mainFrame.getInsets().left - AppGUI.mainFrame.getOpacity()),
 				    (int)(-h-AppGUI.mainFrame.getInsets().top/2 + AppGUI.mainFrame.getOpacity() - 2));
 		
      for (Maf maf:AppGUI.mafs){               
         // MafPanel mp = new MafPanel(maf);
-    	   MafPanel.paintMaf(maf);
+    	   paintMaf(maf);
        }      	
 	  
 	}
@@ -78,7 +77,7 @@ public class AdminGUI extends AppGUI {
 	 * @throws IOException
 	 */
 	public static void createAndShowGUI(byte scale, byte x, byte y){	
-		impanel = new MapPanel(createMap(scale, x, y));	
+		mapPanel = new MapPanel(createMap(scale, x, y));	
 		createFrame();		
 	}
 	/**
@@ -87,7 +86,7 @@ public class AdminGUI extends AppGUI {
 	 * @throws IOException
 	 */
 	public static void createAndShowGUI() {			
-		impanel = new MapPanel(createMap((byte)1,(byte)1,(byte)1));	
+		mapPanel = new MapPanel(createMap((byte)1,(byte)1,(byte)1));	
 		createFrame();		
 	}	
 	
@@ -98,7 +97,7 @@ public class AdminGUI extends AppGUI {
 	 */
 	public static void createAndShowGUI(String source) throws IOException{		
 		Map.setPngScale((byte) 1);
-		impanel = new MapPanel(source);	
+		mapPanel = new MapPanel(source);	
 		createFrame();		
 	}
 }

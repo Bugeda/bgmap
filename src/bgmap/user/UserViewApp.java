@@ -16,12 +16,12 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import bgmap.core.AppConfig;
-import bgmap.core.MapPanel;
-import bgmap.core.MapMouseAdapter;
-import bgmap.core.ThreadMapPart;
-import bgmap.core.entity.*;
+import bgmap.core.controller.MapMouseAdapter;
+import bgmap.core.model.*;
+import bgmap.core.view.MapPanel;
+import bgmap.core.view.ThreadMapPart;
 
-public class UserViewApp extends bgmap.core.AppGUI {
+public class UserViewApp extends bgmap.core.view.AppGUI {
 	   public static void main(String[] args) throws IOException{
 			AppConfig.setConfig(true);			
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -38,7 +38,7 @@ public class UserViewApp extends bgmap.core.AppGUI {
 	private static void createFrame(){	
 		JFrame f = new JFrame();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		
-		f.getContentPane().add(new JScrollPane(impanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
+		f.getContentPane().add(new JScrollPane(mapPanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
 													 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));			  
          		 
 		f.setSize(AppConfig.appWidth, AppConfig.appHeight); 
@@ -53,7 +53,7 @@ public class UserViewApp extends bgmap.core.AppGUI {
 	 * @throws IOException
 	 */
 	public static void createAndShowGUI(byte scale, byte x, byte y) throws IOException{	
-		impanel = new MapPanel(createMap(scale, x, y));	
+		mapPanel = new MapPanel(createMap(scale, x, y));	
 		createFrame();		
 	}
 	/**
@@ -62,7 +62,7 @@ public class UserViewApp extends bgmap.core.AppGUI {
 	 * @throws IOException
 	 */
 	public static void createAndShowGUI() throws IOException{			
-		impanel = new MapPanel(createMap((byte)1,(byte)1,(byte)1));	
+		mapPanel = new MapPanel(createMap((byte)1,(byte)1,(byte)1));	
 		createFrame();		
 	}	
 	
@@ -73,7 +73,7 @@ public class UserViewApp extends bgmap.core.AppGUI {
 	 */
 	public static void createAndShowGUI(String source) throws IOException{		
 		Map.setPngScale((byte) 1);
-		impanel = new MapPanel(source);	
+		mapPanel = new MapPanel(source);	
 		createFrame();		
 	}
 }

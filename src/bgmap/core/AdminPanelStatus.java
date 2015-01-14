@@ -1,4 +1,4 @@
-package bgmap.core.entity;
+package bgmap.core;
 
 public class AdminPanelStatus {
 
