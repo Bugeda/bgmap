@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 
-import bgmap.admin.ViewApp;
 import bgmap.core.entity.Map;
 
 public class ThreadMapPart implements Runnable {	 
@@ -25,7 +24,7 @@ public class ThreadMapPart implements Runnable {
 
 	@Override
 	public synchronized void run() {
-		Image map = new javax.swing.ImageIcon(ViewApp.getPartMapUrl(dy,dx)).getImage();
+		Image map = new javax.swing.ImageIcon(AppGUI.getPartMapUrl(dy,dx)).getImage();
 		Graphics g = Map.getImage().getGraphics();
 		g.setColor(Color.BLACK);
 		g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 40));	
@@ -33,9 +32,9 @@ public class ThreadMapPart implements Runnable {
 		g.drawRect(drawX+x * Map.partMapWidth, drawY+y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);	
 		g.drawString(dy+" "+dx, drawX+x* Map.partMapWidth+150, drawY+y* Map.partMapHeight+200);				
 		map.flush();
-		ViewApp.impanel.loadImage(Map.getImage());
+		AppGUI.impanel.loadImage(Map.getImage());
 		g.dispose();
-		ViewApp.impanel.repaint();	
+		AppGUI.impanel.repaint();	
 	}
 
 }

@@ -1,48 +1,41 @@
-package bgmap.admin;
+package bgmap.core;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.HashSet;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import bgmap.core.AppConfig;
-import bgmap.core.ImagePanel;
-import bgmap.core.MapMouseAdapter;
-import bgmap.core.ThreadMapPart;
 import bgmap.core.entity.*;
 
-public class ViewApp {		
-	public static final byte MAX_scale = 127;
-	public static final byte MIN_scale = 4;
-	public static final byte START_scale = 100;	
-	public static final byte CAPTION_HEIGHT=25;
-	public static ImagePanel impanel;
-	public static JSlider slider;
-    static Image imageArea;
+public class AppGUI {		
+	static final byte MAX_scale = 127;
+	static final byte MIN_scale = 4;
+	static final byte START_scale = 100;	
+	static final byte CAPTION_HEIGHT=25;
+	protected static MapPanel impanel = null;
+	final protected static JSlider slider = new JSlider(JSlider.VERTICAL, MIN_scale, MAX_scale, START_scale);;
+	final protected static JFrame mainFrame = new JFrame("bgmap");
+	final protected static JLayeredPane workPanel = new JLayeredPane();
+	protected static JPanel adminPanel = null;	
+	protected static HashSet<Maf> mafs = new HashSet<Maf>(); 
+	protected static HashSet<MafPanel> mafPanels = new HashSet<MafPanel>(); 
+	
     MapMouseAdapter movingAdapt = new MapMouseAdapter();
 	
-    public static void main(String[] args) throws IOException{
-		AppConfig.setConfig(true);			
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	            public void run() {
-	            	try {
-						createAndShowGUI((byte)1,(byte)50,(byte)23);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-	            }
-	        });
-	}    
 	/**
 	 * @param y
 	 * @param x
@@ -66,7 +59,7 @@ public class ViewApp {
 	            	for(byte x=0; x < columnCount; x ++ ) { 
 	            		Runnable r = new ThreadMapPart(dx, dy, x, y, drawX, drawY);
 	            		Thread t = new Thread(r);
-	            		t.setPriority(t.MAX_PRIORITY);
+	            		t.setPriority(Thread.MAX_PRIORITY);
 	            		t.start();	      
 	            		dx++;
 	                }
@@ -81,21 +74,29 @@ public class ViewApp {
 	 * Save link to the image in Map.class
 	 * @return Image
 	 */	
-	private static Image createMap(byte scale, byte startColumn, byte startRow) {	
+	protected static Image createMap(byte scale, byte startColumn, byte startRow) {	
+		
 		startColumn-=Map.COL_COUNT;
 		startRow-=Map.ROW_COUNT;
 		Image im = new BufferedImage(Map.partMapWidth * Map.COL_COUNT,Map.partMapHeight * Map.ROW_COUNT, BufferedImage.TYPE_INT_RGB);
 		Graphics g = im.getGraphics();
 		g.setColor(Color.BLACK);
 		g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 40));
-		try {        				 
+		     
+			    try {
+					mafs = DBManager.selectMafs(startColumn, (byte) (startColumn+Map.COL_COUNT), startRow, (byte)(startRow+Map.ROW_COUNT));				
+				} catch (SQLException e) {
+		    		AppConfig.lgTRACE.error(e);
+		            AppConfig.lgWARN.error(e);
+		            System.exit(1);	 
+				}
 	        	Image image = null;		        	
 	    		byte dx;
 	    		byte dy=startRow;    		
 	            for(byte y=0; y < Map.ROW_COUNT; y++ ) {        
 	            	dx=startColumn;
 	            	for(byte x=0; x < Map.COL_COUNT; x ++ ) { 		            	
-	            		image = new javax.swing.ImageIcon(ViewApp.getPartMapUrl(dy,dx)).getImage();            		
+	            		image = new ImageIcon(AppGUI.getPartMapUrl(dy,dx)).getImage();            		
 	                    g.drawImage(image, x * Map.partMapWidth, y * Map.partMapHeight, null);
 	            		g.drawRect(x * Map.partMapWidth, y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);	            	
 	            		g.drawString(dy+" "+dx, x* Map.partMapWidth+150, y* Map.partMapHeight+200);
@@ -103,18 +104,15 @@ public class ViewApp {
 	            		dx++;
 	                }
 	            	dy++;
-	            }        	        
+	            }        	     
+		
 	            g.dispose();
 	        	Map.setImage(im);     
 	    		Map.setPngScale(scale);
 	            Map.setStartCol(startColumn);
 	            Map.setStartRow(startRow); 
-	            
-	        } catch (Exception e) {
-	    		AppConfig.lgTRACE.error(e);
-	            AppConfig.lgWARN.error(e);
-	            System.exit(1);	 
-	        } 
+
+	
 		return im; 
     }
 	/**
@@ -129,7 +127,7 @@ public class ViewApp {
 			Map.setImage(newImage);
 			
 			// absolute new coordinates for lefttop full cell 
-			int x =  impanel.offset.x + Map.getMapOffset().x;	
+			int x = impanel.offset.x + Map.getMapOffset().x;	
 			int y = impanel.offset.y + Map.getMapOffset().y;
 			
 			//  signX, signY use when we need calculate absolute left or right side from result position
@@ -227,16 +225,13 @@ public class ViewApp {
 		/*	if (AppConfig.isDEBUG())
 				AppConfig.lgTRACE.debug("Map.getStart after "+Map.getStartCol()+","+Map.getStartRow()); 	*/
 			Map.setMapOffset(new Point(rightPartCellWidth,downPartCellHeight));
-	
 		}
 	}	
-
 	
 	/**
 	 * create slidebar
 	 */
-	private static void createSlider() {          
-        slider = new JSlider(JSlider.VERTICAL, MIN_scale, MAX_scale, START_scale);
+	public static void createSlider() {                 
         slider.setMinorTickSpacing(12);  
         slider.setMajorTickSpacing(25);  
         slider.setPaintTicks(true);  
@@ -244,56 +239,23 @@ public class ViewApp {
         slider.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         slider.setDoubleBuffered(false);     
     }  
-	
-	
-	private static void createFrame(){		
-		JFrame f = new JFrame();
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		
-		f.getContentPane().add(new JScrollPane(impanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
-													 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));	
-		createSlider();   
-		//f.getContentPane()
-		f.getContentPane().add(slider, "East");		
-		slider.addChangeListener(new ChangeListener() {  
-	            public void stateChanged(ChangeEvent e) {  
-	                int value = ((JSlider)e.getSource()).getValue();     
-	                impanel.setScale(value/100.0);	                	               
-	            }  
-	        });         		 
-		f.setSize(AppConfig.appWidth, AppConfig.appHeight); 
-		f.setBackground(Color.gray);
-		f.setResizable(false);
-		f.setVisible(true);		
-	}
-		
 	/**
-	 * Create map from parts of map,
-	 * Starts with scale, from (x, y) map parts
-	 * @throws IOException
+	 * create adminpanel
 	 */
-	public static void createAndShowGUI(byte scale, byte x, byte y) throws IOException{	
-		impanel = new ImagePanel(createMap(scale, x, y));	
-		createFrame();		
-	}
-	/**
-	 * Create map from parts of map,
-	 * Starts with scale=1, from (1, 1) map parts
-	 * @throws IOException
-	 */
-	public static void createAndShowGUI() throws IOException{			
-		impanel = new ImagePanel(createMap((byte)1,(byte)1,(byte)1));	
-		createFrame();		
-	}	
-	
-	/**
-	 * Create map from the source,
-	 * Starts with scale=1
-	 * @throws IOException
-	 */
-	public static void createAndShowGUI(String source) throws IOException{		
-		Map.setPngScale((byte) 1);
-		impanel = new ImagePanel(source);	
-		createFrame();		
-	}
-
+	public static void creadeAdminPanel() {          
+		adminPanel = new JPanel();  		
+		JCheckBox addMAFButton = new JCheckBox("Add object");		
+		addMAFButton.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				System.out.println(e.getStateChange());
+				switch (e.getStateChange()) {
+				case ItemEvent.SELECTED:AdminPanelStatus.setAddMaf(true);break;
+				case ItemEvent.DESELECTED:AdminPanelStatus.setAddMaf(false);break;
+			}
+			}
+		});
+		adminPanel.add(addMAFButton,BorderLayout.CENTER);
+    }  
 }
