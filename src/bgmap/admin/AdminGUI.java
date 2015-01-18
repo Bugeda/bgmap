@@ -43,12 +43,8 @@ public class AdminGUI extends AppGUI {
 		creadeAdminPanel();
 		
 		mainFrame.add(adminPanel, "North");
-		mainFrame.add(slider, "East");		
-		workPanel.add(AppGUI.mapPanel, 1, 0);	
-		
-	
-		
-	    mainFrame.add(new JScrollPane(workPanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
+		mainFrame.add(slider, "East");			
+	    mainFrame.add(new JScrollPane(AppGUI.mapPanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER, 
 				 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));	
 	 	
 		slider.addChangeListener(new ChangeListener() {  
@@ -58,16 +54,12 @@ public class AdminGUI extends AppGUI {
 	            }  
 	        });         		 
 		mainFrame.setVisible(true);	
-	
-		int h = AppGUI.adminPanel !=null ? AppGUI.adminPanel.getHeight() : 0;		
+/*		int h = AppGUI.adminPanel !=null ? AppGUI.adminPanel.getHeight() : 0;		
 		mapPanel.setSize(AppConfig.appWidth - AppGUI.slider.getWidth(), AppConfig.appHeight+h);
 		mapPanel.setLocation((int)(-AppGUI.mainFrame.getInsets().left - AppGUI.mainFrame.getOpacity()),
 				    (int)(-h-AppGUI.mainFrame.getInsets().top/2 + AppGUI.mainFrame.getOpacity() - 2));
-		
-     for (Maf maf:AppGUI.mafs){               
-        // MafPanel mp = new MafPanel(maf);
-    	   paintMaf(maf);
-       }      	
+	*/	
+   	
 	  
 	}
 		

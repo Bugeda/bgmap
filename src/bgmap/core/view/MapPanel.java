@@ -61,7 +61,8 @@ public class MapPanel extends JPanel {
 		
 		private void initPanel(){
 			scale = 1.0;  			
-			Map.setMapOffset(new Point(0,0));				
+			Map.setMapOffset(new Point(0,0));
+			Map.setMapPos(new Point(0,0));
 			addMouseMotionListener(movingAdapt);
 			addMouseListener(movingAdapt);
 			addMouseWheelListener(movingAdapt);
@@ -72,7 +73,6 @@ public class MapPanel extends JPanel {
 				int x = (getWidth() - newImageWidth)/2;  
 				int y = (getHeight() - newImageHeight)/2;
 				Map.setMapPos(new Point(x,y));
-
 			} 
 		   
 		}

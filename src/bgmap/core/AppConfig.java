@@ -19,7 +19,9 @@ public class AppConfig {
 	private static boolean WORKDEBUG = false;
 	
 	final static public String mapsPath = "src/images/maps/";
-	final static public Image sign = new ImageIcon("src/images/src/home.png").getImage();
+	final static public Image sign = new ImageIcon("src/images/src/sign.png").getImage();
+	final static public Image signFull = new ImageIcon("src/images/src/signFull.png").getImage();
+	final static public Image signOn = new ImageIcon("src/images/src/signOn.png").getImage();
 	
 	public static final int appWidth = Toolkit.getDefaultToolkit().getScreenSize().width
 			- Toolkit.getDefaultToolkit().getScreenInsets(

@@ -14,8 +14,8 @@ package bgmap.core.model;
  */
 public class Maf {
 	
-	private int x;
-	private int y;
+	private short x;
+	private short y;
 	private byte colNum;
 	private byte rowNum;
 	private String subjectName;
@@ -29,7 +29,7 @@ public class Maf {
 	private String passport;
 	private String personFullName;
 	
-	public Maf(int x, int y, byte colNum, byte rowNum, String subjectName, String subjectAddress, int subjectRegNum,
+	public Maf(short x, short y, byte colNum, byte rowNum, String subjectName, String subjectAddress, int subjectRegNum,
 			String telephone, String site, String purpose,
 			String objectAddress, String techCharacteristics, String passport,
 			String personFullName) {
@@ -130,7 +130,7 @@ public class Maf {
 		return x;
 	}
 
-	public void setX(int x) {
+	public void setX(short x) {
 		this.x = x;
 	}
 
@@ -138,7 +138,7 @@ public class Maf {
 		return y;
 	}
 
-	public void setY(int y) {
+	public void setY(short y) {
 		this.y = y;
 	}
 	

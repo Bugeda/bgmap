@@ -9,8 +9,8 @@ import bgmap.core.AppConfig;
 public class Map {	
 	
 	public static final short MAX_MAPID = 91;
-	public static final int partMapWidth = 320;
-	public static final int partMapHeight = 480;
+	public static final short partMapWidth = 320;
+	public static final short partMapHeight = 480;
 	public static final byte COL_COUNT=(byte) (AppConfig.appWidth*3 / Map.partMapWidth+2);
 	public static final byte ROW_COUNT=(byte) (AppConfig.appHeight*3 / Map.partMapHeight+2);
 		
