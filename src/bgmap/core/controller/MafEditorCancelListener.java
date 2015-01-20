@@ -11,11 +11,16 @@ import bgmap.core.view.AppGUI;
 import bgmap.core.view.MafEditor;
 
 public class MafEditorCancelListener implements ActionListener, WindowListener, KeyListener{
-
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	
+	private void closeMafEditor(){
 		AppGUI.mainFrame.setEnabled(true);
 		MafEditor.frame.dispose();   		
+		MafEditor.isOpen=false;
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent arg0) {		
+		closeMafEditor();
 	}
 
 	@Override
@@ -32,8 +37,7 @@ public class MafEditorCancelListener implements ActionListener, WindowListener, 
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		AppGUI.mainFrame.setEnabled(true);
-		MafEditor.frame.dispose();   		
+		closeMafEditor();
 	}
 
 	@Override
@@ -63,8 +67,7 @@ public class MafEditorCancelListener implements ActionListener, WindowListener, 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode()==KeyEvent.VK_ESCAPE){
-			AppGUI.mainFrame.setEnabled(true);
-			MafEditor.frame.dispose();   					
+			closeMafEditor();
 		}
 		
 	}

@@ -26,15 +26,15 @@ public class DBManager {
 					  "colNum tinyint not null," +
 					  "rowNum tinyint not null," +
 					  "subjectName text not null," +
-					  "subjectAddress text not null," +					  
-					  "subjectRegNum int not null," +
-					  "telephone text not null," +
-					  "site text not null," +
-					  "purpose text not null," +
-					  "objectAddress text not null," +
-					  "techCharacteristics text not null," +
-					  "passport text not null," +
-					  "personFullName text not null," +
+					  "subjectAddress text," +					  
+					  "subjectRegNum int," +
+					  "telephone text," +
+					  "site text," +
+					  "purpose text," +
+					  "objectAddress text," +
+					  "techCharacteristics text," +
+					  "passport text," +
+					  "personFullName text," +
 					  "PRIMARY KEY (x,y,colnum,rownum));";
 		Connection conn = null;
 		Statement stmt = null;

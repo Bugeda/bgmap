@@ -14,6 +14,17 @@ package bgmap.core.model;
  */
 public class Maf {
 	
+	final public static String SubjectNameField = "Полное наименование субъекта ведения хозяйства";
+	final public static String SubjectAddressField = "Адрес субъекта ведения хозяйства";
+	final public static String SubjectRegNumField = "Номер государственной регистрации субъекта ведения хозяйства";
+	final public static String TelephoneField = "Телефон";
+	final public static String SiteField = "Электронный адрес";
+	final public static String PurposeField = "Назначение малой архитектурной формы";
+	final public static String ObjectAddressField = "Адрес или приблизительное желаемое место размещения";
+	final public static String TechCharacteristicsField = "Технические характеристики малой архитектурной формы ( стационарная или передвижная, павильон, киоск, временное устройство для сезонной торговли, размеры, площадь, кв. метров)";
+	final public static String PassportField = "Дата и номер паспорта привязки";
+	final public static String PersonFullNameField = "Фамилия, имя и отчество уполномоченного лица";
+	
 	private short x;
 	private short y;
 	private byte colNum;
