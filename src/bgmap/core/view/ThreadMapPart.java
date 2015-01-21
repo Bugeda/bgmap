@@ -37,10 +37,10 @@ public class ThreadMapPart implements Runnable {
 		Image map = new javax.swing.ImageIcon(AppGUI.getPartMapUrl(dy,dx)).getImage();
 		Graphics g = Map.getImage().getGraphics();
 		g.setColor(Color.BLACK);
-		g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 40));	
+		//g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 40));	
 		g.drawImage(map, drawX+x * Map.partMapWidth, drawY+y * Map.partMapHeight, null);
-		g.drawRect(drawX+x * Map.partMapWidth, drawY+y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);
-		g.drawString(dy+" "+dx, drawX+x* Map.partMapWidth+150, drawY+y* Map.partMapHeight+200);	
+	//	g.drawRect(drawX+x * Map.partMapWidth, drawY+y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);
+	//	g.drawString(dy+" "+dx, drawX+x* Map.partMapWidth+150, drawY+y* Map.partMapHeight+200);	
 		MafHashKey key = new MafHashKey(dx,dy);
 		ArrayList<MafHashValue> value = AppGUI.mafs.get(key);
 		if (value != null)

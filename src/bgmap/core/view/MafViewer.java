@@ -3,16 +3,21 @@ package bgmap.core.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.MouseInfo;
 import java.awt.Point;
-import java.awt.Rectangle;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,8 +25,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
-
-import org.apache.log4j.Layout;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 import bgmap.core.DecimalTextField;
 import bgmap.core.RegexFormatter;
@@ -31,7 +37,7 @@ import bgmap.core.model.Maf;
 import bgmap.core.model.Map;
 
 
-public class MafEditor extends JFrame {
+public class MafViewer extends JFrame {
 
 	public static JFrame frame;	
     public static JTextField subjectName;
@@ -57,22 +63,50 @@ public class MafEditor extends JFrame {
     static public Point pos = null;
     
     public static boolean isOpen = false;
+	private static Color color = new Color(238,238,238,100);
+	
     static MafEditorOkButtonListener OkButtonListener= new MafEditorOkButtonListener();
       
-    static MafEditorCancelListener Cancelistener= new MafEditorCancelListener();
-       
-    private static void initFrame(){
-
+    static MafEditorCancelListener Cancelistener= new MafEditorCancelListener();       
+            
+    
+    private static void initEditorFrame(){
         AppGUI.mainFrame.setEnabled(false);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setAlwaysOnTop(true);
+        frame.setAlwaysOnTop(true);        
+        frame.setUndecorated(true);
         frame.setResizable(false);
-        frame.addWindowListener(Cancelistener);	        
-        frame.setSize(500, 470); 
-        frame.setLocation(MouseInfo.getPointerInfo().getLocation());
+        frame.addWindowListener(Cancelistener);        
+        frame.setSize(AppGUI.mapPanel.getSize().width/4, 
+        		(int) (AppGUI.mainFrame.getOpacity() + AppGUI.mapPanel.getSize().height));
+        
+        int h = AppGUI.adminPanel !=null ? AppGUI.adminPanel.getHeight() : 0; 
+        Point p = new Point((int)(AppGUI.mainFrame.getOpacity() + AppGUI.mainFrame.getInsets().left), 
+        		(int)(AppGUI.mainFrame.getOpacity() + AppGUI.mainFrame.getInsets().top + h));
+     
+        if (AppGUI.mapPanel.getMousePosition().x < AppGUI.mapPanel.getSize().width/2)
+        	p.x = (int)(AppGUI.mapPanel.getSize().width - frame.getSize().width);
+        
+        frame.setLocation(p);
+        ((JComponent) frame.getContentPane()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         frame.repaint();
         frame.setVisible(true);		
         isOpen=true;
+    }
+    
+    private static void initViewerFrame(){  	
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setAlwaysOnTop(true);
+        frame.setUndecorated(true);
+        frame.setBackground(color);
+        frame.setResizable(false);
+        frame.addWindowListener(Cancelistener);	        
+        frame.setSize(300, 200); 
+        frame.setLocation(MouseInfo.getPointerInfo().getLocation());
+        ((JComponent) frame.getContentPane()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        frame.repaint();
+        frame.setVisible(true);		
+        isOpen=true;        
     }
     
 	public static void createEditor() {
@@ -172,7 +206,7 @@ public class MafEditor extends JFrame {
 	 
 	        frame.add(topPanel,BorderLayout.NORTH);		        
 		    frame.add(bottomPanel);   
-	        initFrame();
+		    initEditorFrame();
 		}		
 	}
 	
@@ -285,7 +319,77 @@ public class MafEditor extends JFrame {
 	 
 	        frame.add(topPanel,BorderLayout.NORTH);
 	        frame.add(bottomPanel);   
-	        initFrame();
+	        initEditorFrame();
 		}	
+	}
+		
+		
+		public static void showMaf(Maf maf){
+			if (!isOpen){
+				frame = new JFrame("Информация о МАФе");
+				
+				JLabel	subjectName = new JLabel(maf.getSubjectName());								
+				JLabel subjectAddress = new JLabel(maf.getSubjectAddress());		
+				JLabel subjectRegNum = new JLabel(Integer.toString(maf.getSubjectRegNum()));	    			   
+				JLabel telephone = new JLabel(maf.getTelephone());
+			    JLabel site = new JLabel(maf.getSite());
+			    JLabel purpose = new JLabel(maf.getPurpose());
+			    JLabel objectAddress = new JLabel(maf.getObjectAddress());
+			    JLabel techCharacteristics = new JLabel(maf.getTechCharacteristics());		        
+			    JLabel passport = new JLabel(maf.getPassport());
+			    JLabel personFullName = new JLabel(maf.getPersonFullName());
+	        
+					    
+				pos = new Point(maf.getX() + (maf.getColNum()-Map.getStartCol())*Map.partMapWidth + Map.getMapPos().x + Map.getMapOffset().x,
+						maf.getY() + (maf.getRowNum()-Map.getStartRow())*Map.partMapHeight + Map.getMapPos().y + Map.getMapOffset().y);			
+
+		        JPanel topPanel = new JPanel();   		       
+		        topPanel.add(subjectName);
+		        subjectName.setFont(new Font(subjectName.getFont().getFontName(), Font.PLAIN, 15));
+		        topPanel.setSize(500, 50);	
+		        
+		        JPanel bottomPanel = new JPanel();
+		        bottomPanel.setSize(500, 150);	
+		        GridBagLayout gbl = new GridBagLayout();
+		        bottomPanel.setLayout(gbl);		        
+		        GridBagConstraints c =  new GridBagConstraints();
+		        c.anchor = GridBagConstraints.NORTHWEST; 
+		        c.fill   = GridBagConstraints.NONE;  
+		        c.gridheight = 1;
+		        c.gridwidth  = GridBagConstraints.REMAINDER; 
+		        c.gridx = 0; 
+		        c.gridy = GridBagConstraints.RELATIVE; 
+		        c.insets = new Insets(0, 10, 0, 10);
+		        c.ipadx = 0;
+		        c.ipady = 0;
+		        c.weightx = 1.0;
+		        c.weighty = 0.0;
+		        bottomPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.BLACK));
+		        
+		        gbl.setConstraints(subjectAddress, c);
+		        bottomPanel.add(subjectAddress);		        
+			    gbl.setConstraints(subjectRegNum, c);
+		        bottomPanel.add(subjectRegNum);
+		        gbl.setConstraints(telephone, c);
+		        bottomPanel.add(telephone);
+		        gbl.setConstraints(site, c);	
+		        bottomPanel.add(site);
+		        gbl.setConstraints(purpose, c);
+		        bottomPanel.add(purpose);	    
+		        gbl.setConstraints(objectAddress, c);	
+		        bottomPanel.add(objectAddress);
+		        gbl.setConstraints(techCharacteristics, c);	
+		        bottomPanel.add(techCharacteristics);
+		        gbl.setConstraints(passport, c);
+		        bottomPanel.add(passport);
+		        gbl.setConstraints(personFullName, c);
+		        bottomPanel.add(personFullName);   	
+		        
+		        bottomPanel.setBackground(color);
+		      
+		        frame.add(topPanel, BorderLayout.NORTH);		
+		        frame.add(bottomPanel);	
+		        initViewerFrame();
+			}	
 	}
 }

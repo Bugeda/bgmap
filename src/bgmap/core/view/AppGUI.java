@@ -33,7 +33,6 @@ public class AppGUI {
 	public static final byte MAX_scale = 127;
 	public static final byte MIN_scale = 4;
 	public static final byte START_scale = 100;	
-	public static final byte CAPTION_HEIGHT=25;
 	public static MapPanel mapPanel = null;
 	public final static JSlider slider = new JSlider(JSlider.VERTICAL, MIN_scale, MAX_scale, START_scale);;
 	public final static JFrame mainFrame = new JFrame("bgmap");	
@@ -82,7 +81,7 @@ public class AppGUI {
 		Image im = new BufferedImage(Map.partMapWidth * Map.COL_COUNT,Map.partMapHeight * Map.ROW_COUNT, BufferedImage.TYPE_INT_RGB);
 		Graphics g = im.getGraphics();
 		g.setColor(Color.BLACK);
-		g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 40));	  
+	//	g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 40));	  
 	    try {
 			mafs = DBManager.selectMafs(startColumn, (byte) (startColumn+Map.COL_COUNT), startRow, (byte)(startRow+Map.ROW_COUNT));
 		} catch (SQLException e) {
@@ -98,8 +97,8 @@ public class AppGUI {
         	for(byte x=0; x < Map.COL_COUNT; x ++ ) { 		            	
         		image = new ImageIcon(AppGUI.getPartMapUrl(dy,dx)).getImage();            		
                 g.drawImage(image, x * Map.partMapWidth, y * Map.partMapHeight, null);
-        		g.drawRect(x * Map.partMapWidth, y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);	            	
-        		g.drawString(dy+" "+dx, x* Map.partMapWidth+150, y* Map.partMapHeight+200);
+        //		g.drawRect(x * Map.partMapWidth, y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);	            	
+        //		g.drawString(dy+" "+dx, x* Map.partMapWidth+150, y* Map.partMapHeight+200);
         		image.flush();
         		dx++;
             }
@@ -130,9 +129,7 @@ public class AppGUI {
 	 */
 	public static void readHashMaf(byte col1, byte col2, byte row1, byte row2){
 		try {	
-			System.out.println("read");
 			MafHashMap addMafs = DBManager.selectMafs((byte)col1, (byte)col2, (byte)row1, (byte)row2);
-			System.out.println("sizedb= "+addMafs.size());
 			Iterator<Entry<MafHashKey, ArrayList<MafHashValue>>> it = addMafs.entrySet().iterator();
 			while (it.hasNext()){
 				Entry<MafHashKey, ArrayList<MafHashValue>> thisEntry = it.next();
@@ -366,7 +363,6 @@ public class AppGUI {
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				System.out.println(e.getStateChange());
 				switch (e.getStateChange()) {
 				case ItemEvent.SELECTED:AdminPanelStatus.setEditMaf(true);break;
 				case ItemEvent.DESELECTED:AdminPanelStatus.setEditMaf(false);break;

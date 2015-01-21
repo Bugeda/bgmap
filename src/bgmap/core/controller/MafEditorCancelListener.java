@@ -8,14 +8,14 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import bgmap.core.view.AppGUI;
-import bgmap.core.view.MafEditor;
+import bgmap.core.view.MafViewer;
 
 public class MafEditorCancelListener implements ActionListener, WindowListener, KeyListener{
 	
 	private void closeMafEditor(){
 		AppGUI.mainFrame.setEnabled(true);
-		MafEditor.frame.dispose();   		
-		MafEditor.isOpen=false;
+		MafViewer.frame.dispose();   		
+		MafViewer.isOpen=false;
 	}
 	
 	@Override

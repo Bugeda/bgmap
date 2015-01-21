@@ -19,7 +19,7 @@ import bgmap.core.model.MafHashValue;
 import bgmap.core.model.Map;
 import bgmap.core.model.dao.DBManager;
 import bgmap.core.view.AppGUI;
-import bgmap.core.view.MafEditor;
+import bgmap.core.view.MafViewer;
 
 public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener, MouseInputListener {
 		
@@ -38,9 +38,13 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 	 
     @Override
     public void mousePressed(MouseEvent e) {
-      		AppGUI.slider.setValue(100);
-      		AppGUI.mapPanel.setMoveFrom(e.getPoint());         
-      		AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+    	if (MafViewer.isOpen) {
+			MafViewer.frame.dispose();   		
+			MafViewer.isOpen=false;
+		}
+      	AppGUI.slider.setValue(100);
+      	AppGUI.mapPanel.setMoveFrom(e.getPoint());         
+      	AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
     }
 
     @Override
@@ -67,43 +71,54 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 	@Override
 	public void mouseClicked(MouseEvent e) {
   		//repaint selected maf
-		System.out.println(e.getClickCount());
 		if (clickedMaf!=null){
+			if (MafViewer.isOpen) {
+				MafViewer.frame.dispose();   		
+				MafViewer.isOpen=false;
+			}
 			AppGUI.paintMaf(AppConfig.signFull, false, clickedMaf);
 		}
-		
+		//check if exist maf
+		if (e.getClickCount() == 1){
+			clickedMaf = null;
+    		short x = (short) ((e.getX() - Map.getMapPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
+    		short y = (short) ((e.getY() - Map.getMapPos().y - Map.getMapOffset().y)  % Map.partMapHeight);        		
+    		byte colNum = (byte) (Map.getStartCol() + (e.getX() - Map.getMapPos().x - Map.getMapOffset().x) / Map.partMapWidth );
+    		byte rowNum = (byte) (Map.getStartRow() + (e.getY() - Map.getMapPos().y - Map.getMapOffset().y) / Map.partMapHeight);
+      		MafHashKey cell = new MafHashKey(colNum, rowNum);
+      		if (AppGUI.mafs.containsKey(cell)){
+      			ArrayList<MafHashValue> list = AppGUI.mafs.get(cell);
+      			MafHashValue coord = new MafHashValue(x, y);
+      	  			for (MafHashValue value:list){
+      	  				if (coord.equals(value)){
+      	  					try {
+      	  						clickedMaf = DBManager.readMaf((short)value.getX(),(short)value.getY(), colNum, rowNum);
+    							AppGUI.paintMaf(AppConfig.signOn, false, clickedMaf);
+    							break;							
+    						} catch (SQLException e1) {
+    							AppConfig.lgTRACE.error(e1);
+    				            AppConfig.lgWARN.error(e1);
+    				            System.exit(1);	
+    						}  	  					
+      	  				}
+      	  			}
+      	  		}
+		}
 		if (AdminPanelStatus.isEditMaf()){
   			AppGUI.slider.setValue(100);	  			
 		     if (e.getClickCount() == 2)   
-		    		MafEditor.createEditor();
-		     else {		 
-		    	 	clickedMaf = null;
-		    		short x = (short) ((e.getX() - Map.getMapPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
-		    		short y = (short) ((e.getY() - Map.getMapPos().y - Map.getMapOffset().y)  % Map.partMapHeight);        		
-		    		byte colNum = (byte) (Map.getStartCol() + (e.getX() - Map.getMapPos().x - Map.getMapOffset().x) / Map.partMapWidth );
-		    		byte rowNum = (byte) (Map.getStartRow() + (e.getY() - Map.getMapPos().y - Map.getMapOffset().y) / Map.partMapHeight);
-		      		MafHashKey cell = new MafHashKey(colNum, rowNum);
-		      		if (AppGUI.mafs.containsKey(cell)){
-		      			ArrayList<MafHashValue> list = AppGUI.mafs.get(cell);
-		      			MafHashValue coord = new MafHashValue(x, y);
-		      	  			for (MafHashValue value:list){
-		      	  				if (coord.equals(value)){
-		      	  					try {
-		      	  						clickedMaf = DBManager.readMaf((short)value.getX(),(short)value.getY(), colNum, rowNum);
-		    							AppGUI.paintMaf(AppConfig.signOn, false, clickedMaf);
-		    							break;							
-		    						} catch (SQLException e1) {
-		    							AppConfig.lgTRACE.error(e1);
-		    				            AppConfig.lgWARN.error(e1);
-		    				            System.exit(1);	
-		    						}  	  					
-		      	  				}
-		      	  			}
-		      	  		}
-		      		if (clickedMaf!=null)
-		      			 MafEditor.editMaf(clickedMaf);  
-		     }	      				     
-		}
+		    		MafViewer.createEditor();
+		     else 		 		    	 
+		      	if (clickedMaf!=null)
+		      		 MafViewer.editMaf(clickedMaf);		      	
+		     } else {
+		    	 System.out.println("else");
+		    	 if (clickedMaf!=null){
+		    		 AppGUI.paintMaf(AppConfig.signOn, false, clickedMaf);
+		    		 MafViewer.showMaf(clickedMaf);			
+		    	 }
+		     }
+			
 	}
 
 	@Override
