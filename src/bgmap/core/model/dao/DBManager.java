@@ -27,7 +27,7 @@ public class DBManager {
 					  "rowNum tinyint not null," +
 					  "subjectName text not null," +
 					  "subjectAddress text," +					  
-					  "subjectRegNum int," +
+					  "subjectRegNum int default 0," +
 					  "telephone text," +
 					  "site text," +
 					  "purpose text," +
@@ -61,15 +61,18 @@ public class DBManager {
 		Statement stmt = null;
 		String fromWhere= "from bgmap where x="+x+" and y="+y+" and colNum="+colNum+" and rowNum="+rowNum +" ";
 		//String sql = "select count(*) as RECORDCOUNT,null,null,null,null,null,null,null,null,null,null,null,null,null "+ fromWhere+"UNION ALL "+
-		String sql = "select * "+fromWhere;
+	    String sql = "select * " + fromWhere;
+		System.out.println(sql);
 			try {
 			Class.forName(JDBC_DRIVER);
 			conn = DriverManager.getConnection(DB_URL);
 			stmt = conn.createStatement();			
 			ResultSet rs = stmt.executeQuery(sql);	
-	/*		int rowcount = 0;
+			/*int rowcount = 0;
 			if (rs.next())
-				rowcount = rs.getInt("RECORDCOUNT");*/
+				rowcount = rs.getInt("RECORDCOUNT");
+			System.out.println(rowcount);*/
+
 			while(rs.next())
 				result = new Maf(x, y, colNum, rowNum, 
 					rs.getString("subjectName"),
@@ -81,8 +84,9 @@ public class DBManager {
 					rs.getString("objectAddress"),
 					rs.getString("techCharacteristics"),
 					rs.getString("passport"),
-					rs.getString("personFullName"));
-							
+					rs.getString("personFullName")
+
+				);									
 		} catch (Exception e) {
 			AppConfig.lgTRACE.error(e);
             AppConfig.lgWARN.error(e);
@@ -139,8 +143,10 @@ public class DBManager {
 		//String sql = "INSERT INTO Employees(inn,name,surname,salary) VALUES(?,?,?,?)";
 
 		String fromWhere= "from bgmap where colNum BETWEEN '"+colNum1+"' and '"+colNum12+"' and rowNum BETWEEN '"+rowNum1 +"' and '"+rowNum2+"'";
-		String sql = "select * "+fromWhere;
-		System.out.println(sql);
+		String sql = "select *, (CASE WHEN  (`subjectName` = \"\") OR (`subjectAddress` = \"\") OR(`subjectRegNum` = 0) OR(`telephone` = \"\") OR (`site` = \"\") "
+				+ "OR(`purpose` = \"\") OR (`objectAddress` = \"\") OR(`techCharacteristics` = \"\") OR (`passport` = \"\")  OR (`personFullName` = \"\") "
+						+ "THEN 'false' else 'true' end) as isFull " + fromWhere;
+	
 		try {
 			Class.forName(JDBC_DRIVER);
 			conn = DriverManager.getConnection(DB_URL);
@@ -152,7 +158,7 @@ public class DBManager {
 				if (!result.containsKey(key))
 					result.put(key, new ArrayList<MafHashValue>());
 				ArrayList<MafHashValue> list = result.get(key);
-				list.add(new MafHashValue(rs.getShort("x"),rs.getShort("y")));
+				list.add(new MafHashValue(rs.getShort("x"), rs.getShort("y"), Boolean.parseBoolean(rs.getString("isFull"))));
 				result.setMafValue(list);
 			}
 
@@ -177,6 +183,7 @@ public class DBManager {
 					);*/
 							
 		} catch (Exception e) {
+			AppConfig.lgTRACE.error(sql);
 			AppConfig.lgTRACE.error(e);
             AppConfig.lgWARN.error(e);
             System.exit(1);	;
@@ -194,16 +201,16 @@ public class DBManager {
 			String where= " where x="+maf.getX()+" and y="+maf.getY()+" and colNum="+maf.getColNum()+" and rowNum="+maf.getRowNum() +" ";
 	
 			String sql = "UPDATE bgmap SET "+
-					"subjectName= '"+ maf.getSubjectName() + "',"+ 
-					"subjectAddress='" + maf.getSubjectAddress() + "',"+
-					"subjectRegNum='"+ maf.getSubjectAddress() + "',"+
-					"telephone='"+ maf.getTelephone() + "',"+
-					"site='" + maf.getSite() + "',"+
-					"purpose='" + maf.getPurpose() + "',"+
-					"objectAddress='" + maf.getObjectAddress() + "',"+ 
-					"techCharacteristics='" + maf.getTechCharacteristics() + "',"+				 
-					"passport='" + 	maf.getPassport() + "',"+
-					"personFullName='"+ maf.getPersonFullName()+"' " + where;
+					"subjectName= '"+ maf.getSubjectName().trim() + "',"+ 
+					"subjectAddress='" + maf.getSubjectAddress().trim() + "',"+
+					"subjectRegNum='"+ maf.getSubjectRegNum() + "',"+
+					"telephone='"+ maf.getTelephone().trim() + "',"+
+					"site='" + maf.getSite() .trim()+ "',"+
+					"purpose='" + maf.getPurpose().trim() + "',"+
+					"objectAddress='" + maf.getObjectAddress().trim() + "',"+ 
+					"techCharacteristics='" + maf.getTechCharacteristics().trim() + "',"+				 
+					"passport='" + 	maf.getPassport().trim() + "',"+
+					"personFullName='"+ maf.getPersonFullName().trim()+"' " + where;
 					 
 			System.out.println(sql);
 			try {

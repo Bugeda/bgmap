@@ -22,6 +22,7 @@ public class AppConfig {
 	final static public Image sign = new ImageIcon("src/images/src/sign.png").getImage();
 	final static public Image signFull = new ImageIcon("src/images/src/signFull.png").getImage();
 	final static public Image signOn = new ImageIcon("src/images/src/signOn.png").getImage();
+	final static public Image signTemp = new ImageIcon("src/images/src/signTemp.png").getImage();
 	
 	public static final int appWidth = Toolkit.getDefaultToolkit().getScreenSize().width
 			- Toolkit.getDefaultToolkit().getScreenInsets(

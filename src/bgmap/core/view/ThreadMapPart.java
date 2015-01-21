@@ -45,10 +45,17 @@ public class ThreadMapPart implements Runnable {
 		ArrayList<MafHashValue> value = AppGUI.mafs.get(key);
 		if (value != null)
 		  for (MafHashValue vl:value)
-			  g.drawImage(AppConfig.signFull, 
-    				Map.getMapOffset().x+Map.partMapWidth*(key.getCol()-Map.getStartCol())+vl.getX() - AppConfig.signFull.getWidth(null)/2,
-    				Map.getMapOffset().y+Map.partMapHeight*(key.getRow()-Map.getStartRow())+vl.getY() - AppConfig.signFull.getHeight(null),
-    				AppConfig.signFull.getWidth(null), AppConfig.signFull.getHeight(null), null);		
+			  if (vl.isFull())
+				  g.drawImage(AppConfig.signFull, 
+		    				Map.getMapOffset().x + Map.partMapWidth * (key.getCol() - Map.getStartCol()) + vl.getX() - AppConfig.signFull.getWidth(null)/2,
+		    				Map.getMapOffset().y + Map.partMapHeight * (key.getRow() - Map.getStartRow()) + vl.getY() - AppConfig.signFull.getHeight(null),
+		    				AppConfig.signFull.getWidth(null), AppConfig.signFull.getHeight(null), null);
+			  else 
+				  g.drawImage(AppConfig.sign, 
+		    				Map.getMapOffset().x + Map.partMapWidth * (key.getCol() - Map.getStartCol()) + vl.getX() - AppConfig.sign.getWidth(null)/2,
+		    				Map.getMapOffset().y + Map.partMapHeight * (key.getRow() - Map.getStartRow()) + vl.getY() - AppConfig.sign.getHeight(null),
+		    				AppConfig.sign.getWidth(null), AppConfig.sign.getHeight(null), null);
+			  		
 		map.flush();
 		AppGUI.mapPanel.loadImage(Map.getImage());
 		g.dispose();

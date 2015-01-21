@@ -19,6 +19,7 @@ import javax.swing.event.ChangeListener;
 import bgmap.core.AppConfig;
 import bgmap.core.model.Maf;
 import bgmap.core.model.Map;
+import bgmap.core.model.dao.DBManager;
 import bgmap.core.view.AppGUI;
 import bgmap.core.view.MapPanel;
 
@@ -38,7 +39,7 @@ public class AdminGUI extends AppGUI {
 		mainFrame.setSize(AppConfig.appWidth, AppConfig.appHeight);
 		mainFrame.setBackground(Color.gray);
 		mainFrame.setResizable(false);
-	
+	  
 		createSlider();
 		creadeAdminPanel();
 		
@@ -53,14 +54,7 @@ public class AdminGUI extends AppGUI {
 	                mapPanel.setScale(value/100.0);	                	               
 	            }  
 	        });         		 
-		mainFrame.setVisible(true);	
-/*		int h = AppGUI.adminPanel !=null ? AppGUI.adminPanel.getHeight() : 0;		
-		mapPanel.setSize(AppConfig.appWidth - AppGUI.slider.getWidth(), AppConfig.appHeight+h);
-		mapPanel.setLocation((int)(-AppGUI.mainFrame.getInsets().left - AppGUI.mainFrame.getOpacity()),
-				    (int)(-h-AppGUI.mainFrame.getInsets().top/2 + AppGUI.mainFrame.getOpacity() - 2));
-	*/	
-   	
-	  
+		mainFrame.setVisible(true);	   	  
 	}
 		
 	/**

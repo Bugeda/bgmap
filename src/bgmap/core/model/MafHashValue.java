@@ -4,14 +4,17 @@ import bgmap.core.AppConfig;
 
 public class MafHashValue{
 	
-	public MafHashValue(short x, short y) {		
+	public MafHashValue(short x, short y, boolean isFull) {		
 		this.x = x;
 		this.y = y;
+		this.isFull = isFull;
 	}
 
 	private short x;
 	
 	private short y;
+	
+	private boolean isFull;
 	
 	public int getX() {
 		return x;
@@ -29,6 +32,14 @@ public class MafHashValue{
 		this.y = y;
 	}
 
+	public boolean isFull() {
+		return isFull;
+	}
+
+	public void setFull(boolean isFull) {
+		this.isFull = isFull;
+	}	
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -47,11 +58,10 @@ public class MafHashValue{
 		if (!(obj instanceof MafHashValue))
 			return false;
 		MafHashValue other = (MafHashValue) obj;
-
 		if (Math.abs(x - other.x) > AppConfig.sign.getWidth(null)/2 )
 			return false;
 		if (( other.y - y > AppConfig.sign.getHeight(null))||(other.y - y < 0))
 			return false;
 		return true;
-	}	
+	}
 }

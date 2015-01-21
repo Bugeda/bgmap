@@ -110,11 +110,18 @@ public class AppGUI {
 			  Entry<MafHashKey, ArrayList<MafHashValue>> thisEntry = it.next();
 			  MafHashKey key = thisEntry.getKey();	
 			  ArrayList<MafHashValue> value = thisEntry.getValue();
-			  for (MafHashValue vl:value)
-				  g.drawImage(AppConfig.signFull, 
-	    				Map.partMapWidth*(key.getCol()-startColumn)+vl.getX() - AppConfig.signFull.getWidth(null)/2,
-	    				Map.partMapHeight*(key.getRow()-startRow)+vl.getY() - AppConfig.signFull.getHeight(null),
-	    				AppConfig.signFull.getWidth(null), AppConfig.signFull.getHeight(null), null);
+			  for (MafHashValue vl:value){
+				  if (vl.isFull())					   	  
+					  g.drawImage(AppConfig.signFull, 
+			    				Map.partMapWidth * (key.getCol() - startColumn) + vl.getX() - AppConfig.signFull.getWidth(null)/2,
+			    				Map.partMapHeight * (key.getRow() - startRow) + vl.getY() - AppConfig.signFull.getHeight(null),
+			    				AppConfig.signFull.getWidth(null), AppConfig.signFull.getHeight(null), null);				
+				  else 				  					 
+					  g.drawImage(AppConfig.sign, 
+			    				Map.partMapWidth * (key.getCol() - startColumn) + vl.getX() - AppConfig.sign.getWidth(null)/2,
+			    				Map.partMapHeight * (key.getRow() - startRow) + vl.getY() - AppConfig.sign.getHeight(null),
+			    				AppConfig.sign.getWidth(null), AppConfig.sign.getHeight(null), null);				  
+			  }
 		}	            	         
 		g.dispose();		
     	Map.setImage(im); 
@@ -335,7 +342,7 @@ public class AppGUI {
 		if (!mafs.containsKey(key))
 			mafs.put(key, new ArrayList<MafHashValue>());
 		ArrayList<MafHashValue> list = mafs.get(key);
-		list.add(new MafHashValue((short)maf.getX(), (short)maf.getY()));
+		list.add(new MafHashValue((short)maf.getX(), (short)maf.getY(), maf.isFull()));
 		mafs.setMafValue(list);
 		}
 		AppGUI.mapPanel.loadImage(Map.getImage());

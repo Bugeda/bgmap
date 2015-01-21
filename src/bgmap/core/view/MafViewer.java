@@ -41,25 +41,25 @@ public class MafViewer extends JFrame {
 
 	public static JFrame frame;	
     public static JTextField subjectName;
-    private static JLabel subjectNameLabel = new JLabel(Maf.SubjectNameField,SwingConstants.CENTER);
+    private static JLabel subjectNameLabel = new JLabel("<html><div align=center>" + Maf.SubjectNameField + "</div></html>", SwingConstants.CENTER);
     public static JTextField subjectAddress;
-    private static JLabel subjectAddressLabel = new JLabel(Maf.ObjectAddressField);
+    private static JLabel subjectAddressLabel = new JLabel("<html><div align=center>" + Maf.ObjectAddressField + "</div></html>", SwingConstants.CENTER);
     public static DecimalTextField subjectRegNum;
-    private static JLabel subjectRegNumLabel = new JLabel(Maf.SubjectRegNumField);
+    private static JLabel subjectRegNumLabel = new JLabel("<html><div align=center>" + Maf.SubjectRegNumField + "</div></html>", SwingConstants.CENTER);
     public static JTextField telephone;
-    private static JLabel telephoneLabel = new JLabel(Maf.TelephoneField);
+    private static JLabel telephoneLabel = new JLabel("<html><div align=center>" + Maf.TelephoneField + "</div></html>", SwingConstants.CENTER);
     public static JFormattedTextField site;    
-    private static JLabel siteLabel = new JLabel(Maf.SiteField);
+    private static JLabel siteLabel = new JLabel("<html><div align=center>" + Maf.SiteField + "</div></html>", SwingConstants.CENTER);
     public static JTextField purpose;
-    private static JLabel purposeLabel = new JLabel(Maf.PurposeField);
+    private static JLabel purposeLabel = new JLabel("<html><div align=center>" + Maf.PurposeField + "</div></html>", SwingConstants.CENTER);
     public static JTextField objectAddress;
-    private static JLabel objectAddressLabel = new JLabel(Maf.ObjectAddressField);
+    private static JLabel objectAddressLabel = new JLabel("<html><div align=center>" + Maf.ObjectAddressField + "</div></html>", SwingConstants.CENTER);
     public static JTextField techCharacteristics; 
-    private static JLabel techCharacteristicsLabel = new JLabel("<html> <div align=center>"+Maf.TechCharacteristicsField+"</div></html>");
+    private static JLabel techCharacteristicsLabel = new JLabel("<html> <div align=center>" + Maf.TechCharacteristicsField + "</div></html>", SwingConstants.CENTER);
     public static JTextField passport;
-    private static JLabel passportLabel = new JLabel(Maf.PassportField);
+    private static JLabel passportLabel = new JLabel("<html><div align=center>" + Maf.PassportField + "</div></html>", SwingConstants.CENTER);
     public static JTextField personFullName;
-    private static JLabel personFullNameLabel = new JLabel(Maf.PersonFullNameField);
+    private static JLabel personFullNameLabel = new JLabel("<html><div align=center>" + Maf.PersonFullNameField + "</div></html>", SwingConstants.CENTER);
     static public Point pos = null;
     
     public static boolean isOpen = false;
@@ -85,7 +85,7 @@ public class MafViewer extends JFrame {
         		(int)(AppGUI.mainFrame.getOpacity() + AppGUI.mainFrame.getInsets().top + h));
      
         if (AppGUI.mapPanel.getMousePosition().x < AppGUI.mapPanel.getSize().width/2)
-        	p.x = (int)(AppGUI.mapPanel.getSize().width - frame.getSize().width);
+        	p.x = (int)(AppGUI.mainFrame.getOpacity() + AppGUI.mapPanel.getSize().width - frame.getSize().width);
         
         frame.setLocation(p);
         ((JComponent) frame.getContentPane()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
@@ -302,7 +302,7 @@ public class MafViewer extends JFrame {
 	        topPanel.add(personFullName);   
 	        
 	        JButton okButton = new JButton("Ok");
-		    okButton.setActionCommand("insert");
+		    okButton.setActionCommand("update");
 		    okButton.addActionListener(OkButtonListener);
 		    okButton.addKeyListener(Cancelistener);		    
 
@@ -324,11 +324,11 @@ public class MafViewer extends JFrame {
 	}
 		
 		
-		public static void showMaf(Maf maf){
+		public static void showMafInfo(Maf maf){
 			if (!isOpen){
 				frame = new JFrame("Информация о МАФе");
 				
-				JLabel	subjectName = new JLabel(maf.getSubjectName());								
+				JLabel subjectName = new JLabel(maf.getSubjectName());								
 				JLabel subjectAddress = new JLabel(maf.getSubjectAddress());		
 				JLabel subjectRegNum = new JLabel(Integer.toString(maf.getSubjectRegNum()));	    			   
 				JLabel telephone = new JLabel(maf.getTelephone());
@@ -337,8 +337,7 @@ public class MafViewer extends JFrame {
 			    JLabel objectAddress = new JLabel(maf.getObjectAddress());
 			    JLabel techCharacteristics = new JLabel(maf.getTechCharacteristics());		        
 			    JLabel passport = new JLabel(maf.getPassport());
-			    JLabel personFullName = new JLabel(maf.getPersonFullName());
-	        
+			    JLabel personFullName = new JLabel(maf.getPersonFullName());	        
 					    
 				pos = new Point(maf.getX() + (maf.getColNum()-Map.getStartCol())*Map.partMapWidth + Map.getMapPos().x + Map.getMapOffset().x,
 						maf.getY() + (maf.getRowNum()-Map.getStartRow())*Map.partMapHeight + Map.getMapPos().y + Map.getMapOffset().y);			

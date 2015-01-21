@@ -39,6 +39,7 @@ public class Maf {
 	private String techCharacteristics;
 	private String passport;
 	private String personFullName;
+	private boolean isFull;
 	
 	public Maf(short x, short y, byte colNum, byte rowNum, String subjectName, String subjectAddress, int subjectRegNum,
 			String telephone, String site, String purpose,
@@ -58,6 +59,19 @@ public class Maf {
 		this.techCharacteristics = techCharacteristics;
 		this.passport = passport;
 		this.personFullName = personFullName;
+		
+		if ((subjectName.length() == 0)||
+			(subjectAddress.length() == 0)||	
+			(subjectRegNum == 0)||
+			(telephone.length() == 0)||
+			(site.length() == 0)||
+			(purpose.length() == 0)||
+			(objectAddress.length() == 0)||
+			(techCharacteristics.length() == 0)||
+			(passport.length() == 0)||
+			(personFullName.length() == 0))
+			this.isFull = false;
+		else this.isFull = true;
 	}
 	
 	public String getSubjectName() {
@@ -152,5 +166,8 @@ public class Maf {
 	public void setY(short y) {
 		this.y = y;
 	}
-	
+
+	public boolean isFull() {
+		return isFull;
+	}	
 }
