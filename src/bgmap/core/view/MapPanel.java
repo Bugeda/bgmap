@@ -1,6 +1,5 @@
-package bgmap.core;
+package bgmap.core.view;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -8,15 +7,17 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import bgmap.core.entity.Map;
+import bgmap.core.AppConfig;
+import bgmap.core.controller.MapMouseAdapter;
+import bgmap.core.model.Map;
 
-    public class ImagePanel extends JPanel {
+public class MapPanel extends JPanel {
 
     	private static Image image;  
  	    double scale; 	        
  	    public Point offset;
  		public Point startPoint;
- 	    MapMouseAdapter movingAdapt = new MapMouseAdapter(); 	   
+ 	    public MapMouseAdapter movingAdapt = new MapMouseAdapter(); 	   
 
 		public void setScale(double s) {  
 	    	scale = s;  	 
@@ -25,7 +26,6 @@ import bgmap.core.entity.Map;
 	         int y = (int) ((Map.getSize().height*scale)/2);   
 	    	setLocation(offset.x, offset.y);*/
 	        repaint();  
-
 	    }  
 		
 	    public void loadImage(String fileName) {          
@@ -60,33 +60,41 @@ import bgmap.core.entity.Map;
 		
 		private void initPanel(){
 			scale = 1.0;  			
-			Map.setMapOffset(new Point(0,0));	
+			Map.setMapOffset(new Point(0,0));
+			Map.setMapPos(new Point(0,0));
 			addMouseMotionListener(movingAdapt);
 			addMouseListener(movingAdapt);
 			addMouseWheelListener(movingAdapt);
 			setBorder(BorderFactory.createEmptyBorder(10,10,10,10)); 
-			//setBackground(Color.white);
+		    if (image != null) { 
+				int newImageWidth = (int) (image.getWidth(null)*scale);  
+				int newImageHeight = (int) (image.getHeight(null)*scale);    	   	     
+				int x = (getWidth() - newImageWidth)/2;  
+				int y = (getHeight() - newImageHeight)/2;
+				Map.setMapPos(new Point(x,y));
+			} 
+		   
 		}
 		
-		public ImagePanel(String img) throws IOException {   
+		public MapPanel(String img){   
 	        loadImage(img);  
 	        initPanel();	    		              
 	    }  
 	   
-	    public ImagePanel(Image img) throws IOException {  
+	    public MapPanel(Image img) {  
 	    	loadImage(img);  
 	    	initPanel();	        
 	    }  	 	    
 	    
         @Override
-        protected void paintComponent(Graphics g) {
-        	
+        protected void paintComponent(Graphics g) {  
 	      	super.paintComponent(g);
-            if (image != null) {                  	
+            if (image != null) {      
     	        int newImageWidth = (int) (image.getWidth(null)*scale);  
     	        int newImageHeight = (int) (image.getHeight(null)*scale);    	   	     
     	        int x = (getWidth() - newImageWidth)/2;  
-    	        int y = (getHeight() - newImageHeight)/2;   
+    	        int y = (getHeight() - newImageHeight)/2; 
+				Map.setMapPos(new Point(x,y));	
     	        //int x = 0;  
     	        //int y = 0;
     	        Graphics2D g2 = (Graphics2D)g;                	   
@@ -99,11 +107,8 @@ import bgmap.core.entity.Map;
     			//Image subImage = ((BufferedImage) image).getSubimage(0, 0, newImageWidth-offset.x, newImageHeight-offset.y);
     	    			
     			//g2.drawImage(subImage, offset.x+x, offset.y+y, newImageWidth-offset.x, newImageHeight-offset.y,null);    	         
-   	            g2.dispose();         	
-   	                	        
-    	    }
-             
+   	            g2.dispose();         	        
+    	    }                 
         }
-
    }
 

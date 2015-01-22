@@ -7,7 +7,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import bgmap.core.*;
-import bgmap.core.entity.*;
+import bgmap.core.model.*;
 
 public class Divide {	
 	public static final String srcMapPath = "src/images/src/";
