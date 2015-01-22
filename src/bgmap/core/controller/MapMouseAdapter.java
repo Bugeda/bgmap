@@ -14,7 +14,6 @@ import bgmap.core.AdminPanelStatus;
 import bgmap.core.AppConfig;
 import bgmap.core.model.Maf;
 import bgmap.core.model.MafHashKey;
-import bgmap.core.model.MafHashMap;
 import bgmap.core.model.MafHashValue;
 import bgmap.core.model.Map;
 import bgmap.core.model.dao.DBManager;
@@ -75,9 +74,9 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 			if (MafViewer.isOpen) {
 				MafViewer.frame.dispose();   		
 				MafViewer.isOpen=false;
-			}System.out.println(clickedMaf.isFull());
-			 if (clickedMaf.isFull())	
-				 
+			}
+			
+			if (clickedMaf.isFull())					
 				 AppGUI.paintMaf(AppConfig.signFull, false, clickedMaf);								
 			  else 				  					 	
 				 AppGUI.paintMaf(AppConfig.sign, false, clickedMaf);
@@ -97,8 +96,7 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
       	  			for (MafHashValue value:list){
       	  				if (coord.equals(value)){
       	  					try {
-      	  						clickedMaf = DBManager.readMaf((short)value.getX(),(short)value.getY(), colNum, rowNum);
-      	  					System.out.println(clickedMaf.isFull());
+      	  						clickedMaf = DBManager.readMaf((short)value.getX(),(short)value.getY(), colNum, rowNum);      	  					
     							break;							
     						} catch (SQLException e1) {
     							AppConfig.lgTRACE.error(e1);

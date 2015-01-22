@@ -2,14 +2,11 @@ package bgmap.core.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.FlowLayout;
+
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.LayoutManager;
 import java.awt.MouseInfo;
 import java.awt.Point;
 
@@ -17,25 +14,19 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 
 import bgmap.core.DecimalTextField;
 import bgmap.core.RegexFormatter;
-import bgmap.core.controller.MafEditorCancelListener;
-import bgmap.core.controller.MafEditorOkButtonListener;
+import bgmap.core.controller.MafViewerCancelListener;
+import bgmap.core.controller.MafViewerOkButtonListener;
 import bgmap.core.model.Maf;
 import bgmap.core.model.Map;
-
 
 public class MafViewer extends JFrame {
 
@@ -65,9 +56,9 @@ public class MafViewer extends JFrame {
     public static boolean isOpen = false;
 	private static Color color = new Color(238,238,238,100);
 	
-    static MafEditorOkButtonListener OkButtonListener= new MafEditorOkButtonListener();
+    static MafViewerOkButtonListener OkButtonListener= new MafViewerOkButtonListener();
       
-    static MafEditorCancelListener Cancelistener= new MafEditorCancelListener();       
+    static MafViewerCancelListener Cancelistener= new MafViewerCancelListener();       
             
     
     private static void initEditorFrame(){
@@ -81,11 +72,11 @@ public class MafViewer extends JFrame {
         		(int) (AppGUI.mainFrame.getOpacity() + AppGUI.mapPanel.getSize().height));
         
         int h = AppGUI.adminPanel !=null ? AppGUI.adminPanel.getHeight() : 0; 
-        Point p = new Point((int)(AppGUI.mainFrame.getOpacity() + AppGUI.mainFrame.getInsets().left), 
-        		(int)(AppGUI.mainFrame.getOpacity() + AppGUI.mainFrame.getInsets().top + h));
+        Point p = new Point((int)(AppGUI.mainFrame.getX() +  AppGUI.mainFrame.getOpacity() + AppGUI.mainFrame.getInsets().left), 
+        		(int)(AppGUI.mainFrame.getY() + AppGUI.mainFrame.getOpacity() + AppGUI.mainFrame.getInsets().top + h));
      
         if (AppGUI.mapPanel.getMousePosition().x < AppGUI.mapPanel.getSize().width/2)
-        	p.x = (int)(AppGUI.mainFrame.getOpacity() + AppGUI.mapPanel.getSize().width - frame.getSize().width);
+        	p.x = (int)(AppGUI.mainFrame.getX() + AppGUI.mainFrame.getOpacity() + AppGUI.mapPanel.getSize().width - frame.getSize().width);
         
         frame.setLocation(p);
         ((JComponent) frame.getContentPane()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
@@ -310,9 +301,15 @@ public class MafViewer extends JFrame {
 	        cancelButton.addActionListener(Cancelistener);        
 	        cancelButton.addKeyListener(Cancelistener);
 	
+	        JButton deleteButton = new JButton("delete");
+	        deleteButton.setActionCommand("delete");
+	        deleteButton.addActionListener(OkButtonListener);
+	        deleteButton.addKeyListener(Cancelistener);		
+		    
 	        JPanel buttonPanel = new JPanel();
 	        buttonPanel.add(okButton);
 	        buttonPanel.add(cancelButton);
+	        buttonPanel.add(deleteButton);
 	        
 	        JPanel bottomPanel = new JPanel(); 
 	        bottomPanel.add(buttonPanel);	
@@ -324,7 +321,7 @@ public class MafViewer extends JFrame {
 	}
 		
 		
-		public static void showMafInfo(Maf maf){
+	public static void showMafInfo(Maf maf){
 			if (!isOpen){
 				frame = new JFrame("Информация о МАФе");
 				

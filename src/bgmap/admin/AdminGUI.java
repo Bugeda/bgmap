@@ -1,31 +1,23 @@
 package bgmap.admin;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.LayoutManager;
 import java.io.IOException;
 
-import javax.swing.JButton;
+
 import javax.swing.JFrame;
-import javax.swing.JLayeredPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
-import javax.swing.OverlayLayout;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import bgmap.core.AppConfig;
-import bgmap.core.model.Maf;
 import bgmap.core.model.Map;
-import bgmap.core.model.dao.DBManager;
 import bgmap.core.view.AppGUI;
 import bgmap.core.view.MapPanel;
 
 public class AdminGUI extends AppGUI {
 	public static void main(String[] args){
-		AppConfig.setConfig(true);			
+		AppConfig.setConfig(false);			
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	            public void run() {
 	            		createAndShowGUI((byte)1,(byte)50,(byte)23);

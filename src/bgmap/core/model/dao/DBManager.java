@@ -2,18 +2,12 @@ package bgmap.core.model.dao;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 import bgmap.core.AppConfig;
 import bgmap.core.model.Maf;
 import bgmap.core.model.MafHashKey;
 import bgmap.core.model.MafHashMap;
 import bgmap.core.model.MafHashValue;
-import bgmap.core.model.Map;
 
 public class DBManager {
 	static final String JDBC_DRIVER = "org.sqlite.JDBC";
@@ -46,6 +40,7 @@ public class DBManager {
 			stmt = conn.createStatement();
 			stmt.executeUpdate(sql);				
 		} catch (Exception e) {
+			AppConfig.lgTRACE.error(sql);
 			AppConfig.lgTRACE.error(e);
             AppConfig.lgWARN.error(e);
             System.exit(1);	
@@ -55,14 +50,13 @@ public class DBManager {
 		if (conn!=null) conn.close();
 	}
 	
-	public static Maf readMaf(short x, short y, byte colNum, byte rowNum) throws SQLException{
+	public static Maf readMaf(short x, short y, byte colNum, byte rowNum) throws SQLException {
 		Maf result = null;
 		Connection conn = null;
 		Statement stmt = null;
 		String fromWhere= "from bgmap where x="+x+" and y="+y+" and colNum="+colNum+" and rowNum="+rowNum +" ";
 		//String sql = "select count(*) as RECORDCOUNT,null,null,null,null,null,null,null,null,null,null,null,null,null "+ fromWhere+"UNION ALL "+
-	    String sql = "select * " + fromWhere;
-		System.out.println(sql);
+	    String sql = "select * " + fromWhere;	
 			try {
 			Class.forName(JDBC_DRIVER);
 			conn = DriverManager.getConnection(DB_URL);
@@ -88,6 +82,7 @@ public class DBManager {
 
 				);									
 		} catch (Exception e) {
+			AppConfig.lgTRACE.error(sql);
 			AppConfig.lgTRACE.error(e);
             AppConfig.lgWARN.error(e);
             System.exit(1);	
@@ -125,9 +120,10 @@ public class DBManager {
 				stmt = conn.createStatement();
 				stmt.executeUpdate(sql);				
 			} catch (Exception e) {
+				AppConfig.lgTRACE.error(sql);
 				AppConfig.lgTRACE.error(e);
-	            AppConfig.lgWARN.error(e);
-	            System.exit(1);	
+	            AppConfig.lgWARN.error(e);	       
+	            throw new SQLException(e); 
 			}			
 			if (stmt!=null) stmt.close();
 			if (conn!=null) conn.close();
@@ -186,7 +182,7 @@ public class DBManager {
 			AppConfig.lgTRACE.error(sql);
 			AppConfig.lgTRACE.error(e);
             AppConfig.lgWARN.error(e);
-            System.exit(1);	;
+            throw new SQLException(e); 
 		}
 		
 		if (stmt!=null) stmt.close();
@@ -210,44 +206,42 @@ public class DBManager {
 					"objectAddress='" + maf.getObjectAddress().trim() + "',"+ 
 					"techCharacteristics='" + maf.getTechCharacteristics().trim() + "',"+				 
 					"passport='" + 	maf.getPassport().trim() + "',"+
-					"personFullName='"+ maf.getPersonFullName().trim()+"' " + where;
-					 
-			System.out.println(sql);
+					"personFullName='"+ maf.getPersonFullName().trim()+"' " + where;					 		
 			try {
 				Class.forName(JDBC_DRIVER);
 				conn = DriverManager.getConnection(DB_URL);
 				stmt = conn.createStatement();
 				stmt.executeUpdate(sql);				
 			} catch (Exception e) {
+				AppConfig.lgTRACE.error(sql);
 				AppConfig.lgTRACE.error(e);
-	            AppConfig.lgWARN.error(e);
-	            System.exit(1);	
+	            AppConfig.lgWARN.error(e);	
+	            throw new SQLException(e); 
 			}			
 			if (stmt!=null) stmt.close();
 			if (conn!=null) conn.close();
 		}
 	}
 	
-	public static void deleteMafs(byte colNum1,byte colNum12, byte rowNum1, byte rowNum2) throws SQLException{
+	public static void deleteMaf(short x, short y, byte colNum, byte rowNum) throws SQLException {
 		Connection conn = null;
 		Statement stmt = null;
 		//rs = st.executeQuery("");
 		//String sql = "INSERT INTO Employees(inn,name,surname,salary) VALUES(?,?,?,?)";
-		String fromWhere= "from bgmap where colNum BETWEEN '"+colNum1+"' and '"+colNum12+"' and rowNum BETWEEN '"+rowNum1 +"' and '"+rowNum2+"'";
-		String sql = "delete * "+fromWhere;
+		String fromWhere= "from bgmap where x ='"+x+"' and y='"+y+"' and colNum ='"+colNum +"' and rowNum ='"+rowNum+"'";
+		String sql = "delete "+fromWhere;
 		try {
-			Class.forName(JDBC_DRIVER);
+			//Class.forName(JDBC_DRIVER);
 			conn = DriverManager.getConnection(DB_URL);
 			stmt = conn.createStatement();
 			stmt.executeUpdate(sql);		
-			System.out.println(sql);
-		} catch (Exception e) {
+		} catch (SQLException e) {
+			AppConfig.lgTRACE.error(sql);
 			AppConfig.lgTRACE.error(e);
             AppConfig.lgWARN.error(e);
-            System.exit(1);	
-		}
-		
+            throw new SQLException(e); 
+		}		
 		if (stmt!=null) stmt.close();
-		if (conn!=null) conn.close();
+		if (conn!=null) conn.close();		
 	}
 }

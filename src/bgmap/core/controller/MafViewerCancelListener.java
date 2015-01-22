@@ -10,7 +10,7 @@ import java.awt.event.WindowListener;
 import bgmap.core.view.AppGUI;
 import bgmap.core.view.MafViewer;
 
-public class MafEditorCancelListener implements ActionListener, WindowListener, KeyListener{
+public class MafViewerCancelListener implements ActionListener, WindowListener, KeyListener{
 	
 	private void closeMafEditor(){
 		AppGUI.mainFrame.setEnabled(true);

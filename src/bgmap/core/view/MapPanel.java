@@ -9,7 +9,6 @@ import javax.swing.JPanel;
 
 import bgmap.core.AppConfig;
 import bgmap.core.controller.MapMouseAdapter;
-import bgmap.core.model.Maf;
 import bgmap.core.model.Map;
 
 public class MapPanel extends JPanel {
@@ -18,7 +17,7 @@ public class MapPanel extends JPanel {
  	    double scale; 	        
  	    public Point offset;
  		public Point startPoint;
- 	    MapMouseAdapter movingAdapt = new MapMouseAdapter(); 	   
+ 	    public MapMouseAdapter movingAdapt = new MapMouseAdapter(); 	   
 
 		public void setScale(double s) {  
 	    	scale = s;  	 

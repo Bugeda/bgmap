@@ -7,25 +7,18 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
 import javax.swing.*;
-import javax.swing.event.*;
 
 import bgmap.core.AdminPanelStatus;
 import bgmap.core.AppConfig;
-import bgmap.core.controller.MapMouseAdapter;
 import bgmap.core.model.*;
 import bgmap.core.model.dao.DBManager;
 
@@ -52,7 +45,7 @@ public class AppGUI {
 	 * and scale.
 	 * 
 	 */
-	private static void loadPartsMap(byte scale, byte startColumn, byte startRow, byte columnCount, byte rowCount, int drawX, int drawY){
+	public static void loadPartsMap(byte scale, byte startColumn, byte startRow, byte columnCount, byte rowCount, int drawX, int drawY){
 				byte dx;
 	    		byte dy=startRow;    		
 	            for(byte y=0; y < rowCount; y++ ) {        
@@ -80,8 +73,8 @@ public class AppGUI {
 		startRow-=Map.ROW_COUNT;
 		Image im = new BufferedImage(Map.partMapWidth * Map.COL_COUNT,Map.partMapHeight * Map.ROW_COUNT, BufferedImage.TYPE_INT_RGB);
 		Graphics g = im.getGraphics();
-		g.setColor(Color.BLACK);
-	//	g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 40));	  
+		/*g.setColor(Color.BLACK);
+		g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 40));	*/  
 	    try {
 			mafs = DBManager.selectMafs(startColumn, (byte) (startColumn+Map.COL_COUNT), startRow, (byte)(startRow+Map.ROW_COUNT));
 		} catch (SQLException e) {
@@ -97,8 +90,8 @@ public class AppGUI {
         	for(byte x=0; x < Map.COL_COUNT; x ++ ) { 		            	
         		image = new ImageIcon(AppGUI.getPartMapUrl(dy,dx)).getImage();            		
                 g.drawImage(image, x * Map.partMapWidth, y * Map.partMapHeight, null);
-        //		g.drawRect(x * Map.partMapWidth, y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);	            	
-        //		g.drawString(dy+" "+dx, x* Map.partMapWidth+150, y* Map.partMapHeight+200);
+        		/*g.drawRect(x * Map.partMapWidth, y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);	            	
+        		g.drawString(dy+" "+dx, x* Map.partMapWidth+150, y* Map.partMapHeight+200);*/
         		image.flush();
         		dx++;
             }
@@ -143,31 +136,7 @@ public class AppGUI {
 			
 				if (!mafs.containsKey(thisEntry.getKey()))
 					mafs.put(thisEntry.getKey(), thisEntry.getValue());
-				/*else{					
-					if (mafs.containsValue(thisEntry.getValue())){
-						System.out.println(thisEntry.getValue().toArray().toString()+" exist");
-					
-					ArrayList<MafHashValue> oldValue = mafs.get(thisEntry.getKey());
-					for (MafHashValue value:thisEntry.getValue()){
-						if (!oldValue.contains(value)){
-							oldValue.add(value);
-						}
-					}
-				}*/
 			}       					
-	/*	System.out.println("sizemafs= "+mafs.size());	
-		it = mafs.entrySet().iterator();
-		while (it.hasNext()){
-			System.out.println("hasnext");
-			Entry<MafHashKey, ArrayList<MafHashValue>> thisEntry = it.next();
-			 MafHashKey key = thisEntry.getKey();
-			  System.out.println(key.getCol()+","+key.getRow());	
-			  ArrayList<MafHashValue> value = thisEntry.getValue();
-			  for (MafHashValue vl:value)
-				  System.out.println(vl.getX()+","+vl.getY());
-			}*/
-		
-		
 		} catch (SQLException e) {
     		AppConfig.lgTRACE.error(e);
             AppConfig.lgWARN.error(e);
@@ -231,30 +200,27 @@ public class AppGUI {
 			byte leftTopCol = (byte) (startCol + extraCols - 1);
 			byte topLeftRow = (byte) (startRow + extraRows - 1);
 			
-			/*if (AppConfig.isDEBUG()){
-				System.out.println(mapPanel.offset);
-	    		System.out.println("Map.getStart "+Map.getStartCol()+","+Map.getStartRow());
-	    		System.out.println("Map.getMapoffset "+Map.getMapOffset()); 
-	    		System.out.println("add "+addColCount+","+addRowCount); 	  	   
-	    		System.out.println("start "+startCol+","+startRow);
-	    		System.out.println("CellWidth=" +  leftPartCellWidth+ "," + rightPartCellWidth);
-	    		System.out.println("cellHeight=" +  upPartCellHeight+ ", " + downPartCellHeight);	    		
-	    		System.out.println("wn=" +  Map.getSize().width+ " hn" + Map.getSize().height);
-	    		System.out.println("dx=" +  dx+ " dy=" + dy);	
-	    		System.out.println("x=" +  x+ " y=" + y);
-	    		System.out.println("wCols=" +  wCols+ " hRows=" + hRows);	
-	    		System.out.println("signX=" +  signX+ " signY=" + signY);	
-	    		System.out.println("signMoveX=" +  signMoveX+ " signMoveY=" + signMoveY);	
-	    		System.out.println("extra=" +  extraCols+ "," + extraRows);
-	    		System.out.println("rightCol=" +  rightCol+ " downRow=" + downRow);	
-	    		System.out.println("COUNT" +  Map.COL_COUNT+ "," + Map.ROW_COUNT);
-	    		System.out.println("lefttopCorner = " +  leftTopCol+ "," + topLeftRow);
-			}*/
-			System.out.println(mafs.size());
-
-			g.setColor(new Color(200,0,0,50));			
-			//paint left side
+			if (AppConfig.isDEBUG()){
+				AppConfig.lgDEBUG.debug(mapPanel.offset);
+				AppConfig.lgDEBUG.debug("Map.getStart "+Map.getStartCol()+","+Map.getStartRow());
+				AppConfig.lgDEBUG.debug("Map.getMapoffset "+Map.getMapOffset()); 
+				AppConfig.lgDEBUG.debug("add "+addColCount+","+addRowCount); 	  	   
+				AppConfig.lgDEBUG.debug("start "+startCol+","+startRow);
+				AppConfig.lgDEBUG.debug("CellWidth=" +  leftPartCellWidth+ "," + rightPartCellWidth);
+				AppConfig.lgDEBUG.debug("cellHeight=" +  upPartCellHeight+ ", " + downPartCellHeight);	    		
+				AppConfig.lgDEBUG.debug("wn=" +  Map.getSize().width+ " hn" + Map.getSize().height);
+				AppConfig.lgDEBUG.debug("dx=" +  dx+ " dy=" + dy);	
+				AppConfig.lgDEBUG.debug("x=" +  x+ " y=" + y);
+				AppConfig.lgDEBUG.debug("wCols=" +  wCols+ " hRows=" + hRows);	
+				AppConfig.lgDEBUG.debug("signX=" +  signX+ " signY=" + signY);	
+				AppConfig.lgDEBUG.debug("signMoveX=" +  signMoveX+ " signMoveY=" + signMoveY);	
+				AppConfig.lgDEBUG.debug("extra=" +  extraCols+ "," + extraRows);
+				AppConfig.lgDEBUG.debug("rightCol=" +  rightCol+ " downRow=" + downRow);	
+				AppConfig.lgDEBUG.debug("COUNT" +  Map.COL_COUNT+ "," + Map.ROW_COUNT);
+				AppConfig.lgDEBUG.debug("lefttopCorner = " +  leftTopCol+ "," + topLeftRow);
+			}
 			
+			//paint left side			
 			if (signMoveX > 0){		
 				readHashMaf(
 						leftTopCol, 
@@ -263,8 +229,7 @@ public class AppGUI {
 						(byte)(topLeftRow + addRowCount*signMoveY+Map.ROW_COUNT - 1));
 				loadPartsMap(Map.getPngScale(), 
 						(byte) (leftTopCol), (byte) (topLeftRow + addRowCount*signMoveY), (byte) (Math.abs(addColCount)), (byte) (Map.ROW_COUNT), 
-						leftPartCellWidth,upPartCellHeight+hRows*(signMoveY));	
-			
+						leftPartCellWidth,upPartCellHeight+hRows*(signMoveY));				
 			} 
 			//paint right side
 			else {					
@@ -286,8 +251,7 @@ public class AppGUI {
 						(byte)(topLeftRow + Math.abs(addRowCount) - 1));
 				loadPartsMap(Map.getPngScale(), 
 						(byte) (leftTopCol), (byte) (topLeftRow),(byte) (Map.COL_COUNT + 1),  (byte) (Math.abs(addRowCount)), 
-						leftPartCellWidth, upPartCellHeight);	
-				
+						leftPartCellWidth, upPartCellHeight);					
 			}
 			//paint down side
 			else{	
@@ -300,8 +264,6 @@ public class AppGUI {
 						(byte) (leftTopCol), (byte) (topLeftRow + Map.ROW_COUNT - (1 + addRowCount)*downRow), (byte) (Map.COL_COUNT + 1), (byte) (Math.abs(addRowCount)), 
 						leftPartCellWidth, Map.getSize().height - hRows + downPartCellHeight);		
 			}			
-	
-			System.out.println(mafs.size());	
 			
 			Iterator<Entry<MafHashKey, ArrayList<MafHashValue>>> it = mafs.entrySet().iterator();
 			while (it.hasNext()){
@@ -312,14 +274,11 @@ public class AppGUI {
 							  (key.getRow() < topLeftRow) || 
 							  (key.getRow() > topLeftRow + Map.ROW_COUNT))					  
 						  it.remove();						
-				}	     	
-			System.out.println(mafs.size());					
+				}	     							
 			
 			//+1 becouse start col/row must be full cell
 			Map.setStartCol((byte) (leftTopCol + 1));
 			Map.setStartRow((byte) (topLeftRow + 1));
-		/*	if (AppConfig.isDEBUG())
-				AppConfig.lgTRACE.debug("Map.getStart after "+Map.getStartCol()+","+Map.getStartRow()); 	*/
 			Map.setMapOffset(new Point(rightPartCellWidth,downPartCellHeight));
 		}
 
@@ -332,19 +291,18 @@ public class AppGUI {
 	
 	public static void paintMaf(Image sign, boolean isNew, Maf maf){	
 		Graphics g = Map.getImage().getGraphics();  		
-		g.setColor(Color.red);
 		g.drawImage(sign, 
 				Map.getMapOffset().x+Map.partMapWidth*(maf.getColNum()-Map.getStartCol())+maf.getX() - sign.getWidth(null)/2,
 				Map.getMapOffset().y+Map.partMapHeight*(maf.getRowNum()-Map.getStartRow())+maf.getY() - sign.getHeight(null),
 				sign.getWidth(null), sign.getHeight(null), null);
 		if (isNew){
-		MafHashKey key = new MafHashKey(maf.getColNum(),maf.getRowNum());
-		if (!mafs.containsKey(key))
-			mafs.put(key, new ArrayList<MafHashValue>());
-		ArrayList<MafHashValue> list = mafs.get(key);
-		list.add(new MafHashValue((short)maf.getX(), (short)maf.getY(), maf.isFull()));
-		mafs.setMafValue(list);
-		}
+			MafHashKey key = new MafHashKey(maf.getColNum(),maf.getRowNum());
+			if (!mafs.containsKey(key))
+				mafs.put(key, new ArrayList<MafHashValue>());
+			ArrayList<MafHashValue> list = mafs.get(key);
+			list.add(new MafHashValue((short)maf.getX(), (short)maf.getY(), maf.isFull()));
+			mafs.setMafValue(list);
+			}
 		AppGUI.mapPanel.loadImage(Map.getImage());
 		g.dispose();
 		AppGUI.mapPanel.repaint();	
@@ -377,5 +335,5 @@ public class AppGUI {
 			}
 		});
 		adminPanel.add(addMAFButton,BorderLayout.CENTER);
-    }  
+    } 
 }
