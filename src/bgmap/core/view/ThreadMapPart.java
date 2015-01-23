@@ -11,7 +11,8 @@ import bgmap.core.model.MafHashKey;
 import bgmap.core.model.MafHashValue;
 import bgmap.core.model.Map;
 
-public class ThreadMapPart implements Runnable {	 
+public class ThreadMapPart implements Runnable {
+		 
 	 private byte dx, dy;	 
 	 private byte x, y;	 
 	 private int drawX, drawY;	 
@@ -35,7 +36,7 @@ public class ThreadMapPart implements Runnable {
 		/*g.drawRect(drawX+x * Map.partMapWidth, drawY+y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);
 		g.drawString(dy+" "+dx, drawX+x* Map.partMapWidth+150, drawY+y* Map.partMapHeight+200);	*/
 		MafHashKey key = new MafHashKey(dx,dy);
-		ArrayList<MafHashValue> value = AppGUI.mafs.get(key);
+		ArrayList<MafHashValue> value = AppGUI.getMafs().get(key);
 		if (value != null)
 		  for (MafHashValue vl:value)
 			  if (vl.isFull())

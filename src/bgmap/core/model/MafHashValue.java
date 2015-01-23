@@ -10,10 +10,8 @@ public class MafHashValue{
 		this.isFull = isFull;
 	}
 
-	private short x;
-	
+	private short x;	
 	private short y;
-	
 	private boolean isFull;
 	
 	public int getX() {

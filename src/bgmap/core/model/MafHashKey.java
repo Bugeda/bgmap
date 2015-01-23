@@ -2,8 +2,7 @@ package bgmap.core.model;
 
 public class MafHashKey {
 
-	private byte col;
-	
+	private byte col;	
 	private byte row;
 	
 	public byte getCol() {

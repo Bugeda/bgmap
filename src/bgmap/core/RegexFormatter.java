@@ -40,8 +40,8 @@ import javax.swing.text.DefaultFormatter;
 * A regular expression based implementation of AbstractFormatter.
 */
 public class RegexFormatter extends DefaultFormatter {
+	
  private Pattern pattern;
-
  private Matcher matcher;
 
  public RegexFormatter() {
@@ -110,6 +110,7 @@ public class RegexFormatter extends DefaultFormatter {
   *          String to convert
   * @return Object representation of text
   */
+ @Override
  public Object stringToValue(String text) throws ParseException {
    Pattern pattern = getPattern();
 

@@ -1,6 +1,7 @@
 package bgmap.core.controller;
 
 import java.awt.Cursor;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
@@ -19,10 +20,24 @@ import bgmap.core.model.Map;
 import bgmap.core.model.dao.DBManager;
 import bgmap.core.view.AppGUI;
 import bgmap.core.view.MafViewer;
+import bgmap.core.view.MapPanel;
 
 public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener, MouseInputListener {
-		
-	Maf clickedMaf;
+
+	private Point startMovePoint;
+	
+	private void setMoveFrom(Point p){
+		startMovePoint = p;
+		startMovePoint.x -= AppGUI.mapPanel.getOffset().x;
+		startMovePoint.y -= AppGUI.mapPanel.getOffset().y;		
+	}
+	
+	private void setMoveTo(Point p){		   
+		if (startMovePoint!=null){
+			AppGUI.mapPanel.setOffset(new Point(p.x - startMovePoint.x, p.y - startMovePoint.y));			
+			AppGUI.mapPanel.repaint();
+		}
+	}
 	
     @Override
 	public void mouseWheelMoved(MouseWheelEvent e) {		
@@ -37,21 +52,21 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 	 
     @Override
     public void mousePressed(MouseEvent e) {
-    	if (MafViewer.isOpen) {
+    	if (MafViewer.isOpen()) {
 			MafViewer.frame.dispose();   		
-			MafViewer.isOpen=false;
+			MafViewer.setOpen(false);
 		}
       	AppGUI.slider.setValue(100);
-      	AppGUI.mapPanel.setMoveFrom(e.getPoint());         
+      	setMoveFrom(e.getPoint());         
       	AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {        	
-    	if (AppGUI.mapPanel.startPoint !=null){
+    	if (startMovePoint !=null){
           		AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 				AppGUI.repaintMap();
-				AppGUI.mapPanel.startPoint = null;
+				startMovePoint = null;
 		    	AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));                      
     	}    		     		
     }
@@ -59,7 +74,7 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
     @Override
     public void mouseDragged(MouseEvent e) {
     	if (Map.isScrollable(e.getPoint()))
-    		AppGUI.mapPanel.setMoveTo(e.getPoint());    	
+    		setMoveTo(e.getPoint());    	
     	else mouseReleased(e);    		
     }
 
@@ -70,33 +85,30 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 	@Override
 	public void mouseClicked(MouseEvent e) {
   		//repaint selected maf
-		if (clickedMaf!=null){
-			if (MafViewer.isOpen) {
-				MafViewer.frame.dispose();   		
-				MafViewer.isOpen=false;
-			}
+		if (AppGUI.getClickedMaf()!=null){
+			MafViewer.closeMafViewer();
 			
-			if (clickedMaf.isFull())					
-				 AppGUI.paintMaf(AppConfig.signFull, false, clickedMaf);								
+			if (AppGUI.getClickedMaf().isFull())					
+				 AppGUI.paintClickedMaf(AppConfig.signFull, false);								
 			  else 				  					 	
-				 AppGUI.paintMaf(AppConfig.sign, false, clickedMaf);
+				 AppGUI.paintClickedMaf(AppConfig.sign, false);
 		}
 		//check if exist maf
 		if (e.getClickCount() == 1){
-			clickedMaf = null;
-    		short x = (short) ((e.getX() - Map.getMapPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
-    		short y = (short) ((e.getY() - Map.getMapPos().y - Map.getMapOffset().y)  % Map.partMapHeight); 
+			AppGUI.setClickedMaf(null);
+    		short x = (short) ((e.getX() - MapPanel.getPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
+    		short y = (short) ((e.getY() - MapPanel.getPos().y - Map.getMapOffset().y)  % Map.partMapHeight); 
     		boolean isFull = false;
-    		byte colNum = (byte) (Map.getStartCol() + (e.getX() - Map.getMapPos().x - Map.getMapOffset().x) / Map.partMapWidth );
-    		byte rowNum = (byte) (Map.getStartRow() + (e.getY() - Map.getMapPos().y - Map.getMapOffset().y) / Map.partMapHeight);
+    		byte colNum = (byte) (Map.getStartCol() + (e.getX() - MapPanel.getPos().x - Map.getMapOffset().x) / Map.partMapWidth );
+    		byte rowNum = (byte) (Map.getStartRow() + (e.getY() - MapPanel.getPos().y - Map.getMapOffset().y) / Map.partMapHeight);
       		MafHashKey cell = new MafHashKey(colNum, rowNum);
-      		if (AppGUI.mafs.containsKey(cell)){
-      			ArrayList<MafHashValue> list = AppGUI.mafs.get(cell);
+      		if (AppGUI.getMafs().containsKey(cell)){
+      			ArrayList<MafHashValue> list = AppGUI.getMafs().get(cell);
       			MafHashValue coord = new MafHashValue(x, y, isFull);
       	  			for (MafHashValue value:list){
       	  				if (coord.equals(value)){
       	  					try {
-      	  						clickedMaf = DBManager.readMaf((short)value.getX(),(short)value.getY(), colNum, rowNum);      	  					
+      	  						AppGUI.setClickedMaf(DBManager.readMaf((short)value.getX(),(short)value.getY(), colNum, rowNum));      	  					
     							break;							
     						} catch (SQLException e1) {
     							AppConfig.lgTRACE.error(e1);
@@ -112,15 +124,15 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 			if (e.getClickCount() == 2) 
 				MafViewer.createEditor();
 			else 		 		    	 
-		      	if (clickedMaf!=null){		      		
-		      		AppGUI.paintMaf(AppConfig.signOn, false, clickedMaf);				    
-		      		MafViewer.editMaf(clickedMaf);		      		
+		      	if (AppGUI.getClickedMaf()!=null){		      		
+		      		AppGUI.paintClickedMaf(AppConfig.signOn, false);				    
+		      		MafViewer.editClickedMaf();		      		
 		      	}
 		}
 		else {
-			if (clickedMaf!=null) {
-		  		AppGUI.paintMaf(AppConfig.signOn, false, clickedMaf);
-	    		MafViewer.showMafInfo(clickedMaf);		
+			if (AppGUI.getClickedMaf()!=null) {
+		  		AppGUI.paintClickedMaf(AppConfig.signOn, false);
+	    		MafViewer.showClickedMafInfo();		
 			}
 		}		
 	}
@@ -131,10 +143,10 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-    	if (AppGUI.mapPanel.startPoint !=null){
+    	if (startMovePoint !=null){
     		AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));    		  		
 			AppGUI.repaintMap();			            
-    		AppGUI.mapPanel.startPoint = null;
+    		startMovePoint = null;
     		AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     	}    		     		
     }

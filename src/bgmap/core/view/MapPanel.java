@@ -14,10 +14,26 @@ import bgmap.core.model.Map;
 public class MapPanel extends JPanel {
 
     	private static Image image;  
- 	    double scale; 	        
- 	    public Point offset;
- 		public Point startPoint;
- 	    public MapMouseAdapter movingAdapt = new MapMouseAdapter(); 	   
+ 	    private static double scale; 	        
+ 	    private static Point offset;
+ 	    private static Point pos;
+	
+		private MapMouseAdapter movingAdapt = new MapMouseAdapter(); 
+		
+ 	    public Point getOffset() {
+			return offset;
+		}
+
+		public void setOffset(Point offset) {
+			MapPanel.offset = offset;
+		}
+		public static Point getPos() {
+			return pos;
+		}
+
+		public static void setPos(Point pos) {
+			MapPanel.pos = pos;
+		}
 
 		public void setScale(double s) {  
 	    	scale = s;  	 
@@ -45,23 +61,11 @@ public class MapPanel extends JPanel {
 			image = newIm;
 			offset = new Point(0, 0);
 		}  
-	    
-		public void setMoveFrom(Point p){
-			startPoint = p;
-			startPoint.x -= offset.x;
-			startPoint.y -= offset.y;		
-		}
-		
-		public void setMoveTo(Point p){		   
-			if (startPoint!=null) 
-				offset = new Point(p.x - startPoint.x, p.y - startPoint.y);
-	        repaint();
-		}
 		
 		private void initPanel(){
 			scale = 1.0;  			
 			Map.setMapOffset(new Point(0,0));
-			Map.setMapPos(new Point(0,0));
+			setPos(new Point(0,0));
 			addMouseMotionListener(movingAdapt);
 			addMouseListener(movingAdapt);
 			addMouseWheelListener(movingAdapt);
@@ -71,7 +75,7 @@ public class MapPanel extends JPanel {
 				int newImageHeight = (int) (image.getHeight(null)*scale);    	   	     
 				int x = (getWidth() - newImageWidth)/2;  
 				int y = (getHeight() - newImageHeight)/2;
-				Map.setMapPos(new Point(x,y));
+				setPos(new Point(x,y));
 			} 
 		   
 		}
@@ -94,7 +98,7 @@ public class MapPanel extends JPanel {
     	        int newImageHeight = (int) (image.getHeight(null)*scale);    	   	     
     	        int x = (getWidth() - newImageWidth)/2;  
     	        int y = (getHeight() - newImageHeight)/2; 
-				Map.setMapPos(new Point(x,y));	
+				setPos(new Point(x,y));	
     	        //int x = 0;  
     	        //int y = 0;
     	        Graphics2D g2 = (Graphics2D)g;                	   
@@ -110,5 +114,9 @@ public class MapPanel extends JPanel {
    	            g2.dispose();         	        
     	    }                 
         }
+
+
+
+
    }
 

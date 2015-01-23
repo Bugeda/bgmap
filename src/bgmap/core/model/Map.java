@@ -20,7 +20,6 @@ public class Map {
 	private static byte pngScale = 1;
 	private static Point mapOffset;
 	private static Dimension size;
-	private static Point mapPos;
 		
 	public static Image getImage() {
 		return image;
@@ -73,18 +72,9 @@ public class Map {
 		//ViewMapTest.impanel.offset=new Point(0,0);
 		return true;
 	}
-
 	
 	public static Dimension getSize() {
 		return new Dimension(Map.partMapWidth * Map.COL_COUNT, Map.partMapHeight * Map.ROW_COUNT);
-	}
-
-	public static Point getMapPos() {
-		return mapPos;
-	}
-
-	public static void setMapPos(Point mapPos) {
-		Map.mapPos = mapPos;
 	}
 
 }

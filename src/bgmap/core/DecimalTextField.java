@@ -17,8 +17,8 @@ public class DecimalTextField extends JTextField {
 		  setDecimal(subjectRegNum);
 	}
 
-	public Integer getDecimal() {
-	    Integer res = 0;
+	public int getDecimal() {
+		int res = 0;
 	    try{	    	
 	    	res = Integer.valueOf(this.getText());	    	
 	    	} catch(NumberFormatException e) {	    		

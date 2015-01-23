@@ -23,16 +23,33 @@ import bgmap.core.model.*;
 import bgmap.core.model.dao.DBManager;
 
 public class AppGUI {		
+	
 	public static final byte MAX_scale = 127;
 	public static final byte MIN_scale = 4;
 	public static final byte START_scale = 100;	
-	public static MapPanel mapPanel = null;
-	public final static JSlider slider = new JSlider(JSlider.VERTICAL, MIN_scale, MAX_scale, START_scale);;
-	public final static JFrame mainFrame = new JFrame("bgmap");	
+	public static final JSlider slider = new JSlider(JSlider.VERTICAL, MIN_scale, MAX_scale, START_scale);;
+	public static final JFrame mainFrame = new JFrame("bgmap");	
 	protected static JPanel adminPanel = null;	
-	public static MafHashMap mafs =  new MafHashMap(); 
+	public static MapPanel mapPanel = null;
+	private static MafHashMap mafs =  new MafHashMap(); 
+	private static Maf clickedMaf;
+
+	public static MafHashMap getMafs() {
+		return mafs;
+	}
+
+	public static void setMafs(MafHashMap mafs) {
+		AppGUI.mafs = mafs;
+	} 
 	
-		
+	public static Maf getClickedMaf() {
+		return clickedMaf;
+	}
+
+	public static void setClickedMaf(Maf clickedMaf) {
+		AppGUI.clickedMaf = clickedMaf;
+	}
+	
 	/**
 	 * return url to png file with part of map
 	 */
@@ -76,7 +93,7 @@ public class AppGUI {
 		/*g.setColor(Color.BLACK);
 		g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 40));	*/  
 	    try {
-			mafs = DBManager.selectMafs(startColumn, (byte) (startColumn+Map.COL_COUNT), startRow, (byte)(startRow+Map.ROW_COUNT));
+			setMafs(DBManager.selectMafs(startColumn, (byte) (startColumn+Map.COL_COUNT), startRow, (byte)(startRow+Map.ROW_COUNT)));
 		} catch (SQLException e) {
     		AppConfig.lgTRACE.error(e);
             AppConfig.lgWARN.error(e);
@@ -98,7 +115,7 @@ public class AppGUI {
         	dy++;
         }        
         //read all mafs and paint them 
-        Iterator<Entry<MafHashKey, ArrayList<MafHashValue>>> it = mafs.entrySet().iterator();
+        Iterator<Entry<MafHashKey, ArrayList<MafHashValue>>> it = getMafs().entrySet().iterator();
 		while (it.hasNext()){
 			  Entry<MafHashKey, ArrayList<MafHashValue>> thisEntry = it.next();
 			  MafHashKey key = thisEntry.getKey();	
@@ -134,8 +151,8 @@ public class AppGUI {
 			while (it.hasNext()){
 				Entry<MafHashKey, ArrayList<MafHashValue>> thisEntry = it.next();
 			
-				if (!mafs.containsKey(thisEntry.getKey()))
-					mafs.put(thisEntry.getKey(), thisEntry.getValue());
+				if (!getMafs().containsKey(thisEntry.getKey()))
+					getMafs().put(thisEntry.getKey(), thisEntry.getValue());
 			}       					
 		} catch (SQLException e) {
     		AppConfig.lgTRACE.error(e);
@@ -145,23 +162,23 @@ public class AppGUI {
 	}
 	
 	public static void repaintMap(){
-		if ((mapPanel.offset.x!=0)||(mapPanel.offset.y!=0)){
+		if ((mapPanel.getOffset().x!=0)||(mapPanel.getOffset().y!=0)){
 			Image newImage = new BufferedImage(Map.getSize().width,Map.getSize().height, BufferedImage.TYPE_INT_RGB);			
 			Image subImage = ((BufferedImage) Map.getImage()).getSubimage(0, 0, Map.getSize().width,Map.getSize().height);
 			Graphics g = newImage.getGraphics();
-			g.drawImage(subImage, (int)(mapPanel.offset.x), (int)(mapPanel.offset.y), null);
+			g.drawImage(subImage, (int)(mapPanel.getOffset().x), (int)(mapPanel.getOffset().y), null);
 			Map.setImage(newImage);
 			
 			// absolute new coordinates for lefttop full cell 
-			int x = mapPanel.offset.x + Map.getMapOffset().x;	
-			int y = mapPanel.offset.y + Map.getMapOffset().y;
+			int x = mapPanel.getOffset().x + Map.getMapOffset().x;	
+			int y = mapPanel.getOffset().y + Map.getMapOffset().y;
 			
 			//  signX, signY use when we need calculate absolute left or right side from result position
 			//  signMoveX, signMoveY use when we need calculate just mouse move
 			byte signX = (byte) (x > 0 ? 1 : 0);	
-			byte signMoveX = (byte) (mapPanel.offset.x > 0 ? 1 : 0);	
+			byte signMoveX = (byte) (mapPanel.getOffset().x > 0 ? 1 : 0);	
 			byte signY = (byte) (y > 0 ? 1 : 0);	
-			byte signMoveY = (byte) (mapPanel.offset.y > 0 ? 1 : 0);	
+			byte signMoveY = (byte) (mapPanel.getOffset().y > 0 ? 1 : 0);	
 			
 			/* Calculate coordinates and parts of one cell at axes
 			 * right/down
@@ -201,7 +218,7 @@ public class AppGUI {
 			byte topLeftRow = (byte) (startRow + extraRows - 1);
 			
 			if (AppConfig.isDEBUG()){
-				AppConfig.lgDEBUG.debug(mapPanel.offset);
+				AppConfig.lgDEBUG.debug(mapPanel.getOffset());
 				AppConfig.lgDEBUG.debug("Map.getStart "+Map.getStartCol()+","+Map.getStartRow());
 				AppConfig.lgDEBUG.debug("Map.getMapoffset "+Map.getMapOffset()); 
 				AppConfig.lgDEBUG.debug("add "+addColCount+","+addRowCount); 	  	   
@@ -265,7 +282,8 @@ public class AppGUI {
 						leftPartCellWidth, Map.getSize().height - hRows + downPartCellHeight);		
 			}			
 			
-			Iterator<Entry<MafHashKey, ArrayList<MafHashValue>>> it = mafs.entrySet().iterator();
+			//remove excess mafs from mafs HashMap
+			Iterator<Entry<MafHashKey, ArrayList<MafHashValue>>> it = getMafs().entrySet().iterator();
 			while (it.hasNext()){
 					  Entry<MafHashKey, ArrayList<MafHashValue>> thisEntry = it.next();
 					  MafHashKey key = thisEntry.getKey();	
@@ -286,22 +304,21 @@ public class AppGUI {
 	
 
 	/**
-	 * paint maf
-	 */
-	
-	public static void paintMaf(Image sign, boolean isNew, Maf maf){	
+	 * paint ClickedMaf
+	 */		
+	public static void paintClickedMaf(Image sign, boolean isNew){	
 		Graphics g = Map.getImage().getGraphics();  		
 		g.drawImage(sign, 
-				Map.getMapOffset().x+Map.partMapWidth*(maf.getColNum()-Map.getStartCol())+maf.getX() - sign.getWidth(null)/2,
-				Map.getMapOffset().y+Map.partMapHeight*(maf.getRowNum()-Map.getStartRow())+maf.getY() - sign.getHeight(null),
+				Map.getMapOffset().x+Map.partMapWidth*(clickedMaf.getColNum()-Map.getStartCol())+clickedMaf.getX() - sign.getWidth(null)/2,
+				Map.getMapOffset().y+Map.partMapHeight*(clickedMaf.getRowNum()-Map.getStartRow())+clickedMaf.getY() - sign.getHeight(null),
 				sign.getWidth(null), sign.getHeight(null), null);
 		if (isNew){
-			MafHashKey key = new MafHashKey(maf.getColNum(),maf.getRowNum());
-			if (!mafs.containsKey(key))
-				mafs.put(key, new ArrayList<MafHashValue>());
-			ArrayList<MafHashValue> list = mafs.get(key);
-			list.add(new MafHashValue((short)maf.getX(), (short)maf.getY(), maf.isFull()));
-			mafs.setMafValue(list);
+			MafHashKey key = new MafHashKey(clickedMaf.getColNum(),clickedMaf.getRowNum());
+			if (!getMafs().containsKey(key))
+				getMafs().put(key, new ArrayList<MafHashValue>());
+			ArrayList<MafHashValue> list = getMafs().get(key);
+			list.add(new MafHashValue((short)clickedMaf.getX(), (short)clickedMaf.getY(), clickedMaf.isFull()));
+			getMafs().setMafValue(list);
 			}
 		AppGUI.mapPanel.loadImage(Map.getImage());
 		g.dispose();
@@ -335,5 +352,5 @@ public class AppGUI {
 			}
 		});
 		adminPanel.add(addMAFButton,BorderLayout.CENTER);
-    } 
+    }
 }

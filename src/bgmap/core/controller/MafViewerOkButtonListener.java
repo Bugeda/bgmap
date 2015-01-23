@@ -12,23 +12,25 @@ import bgmap.core.model.*;
 import bgmap.core.model.dao.DBManager;
 import bgmap.core.view.AppGUI;
 import bgmap.core.view.MafViewer;
+import bgmap.core.view.MapPanel;
 
 public class MafViewerOkButtonListener implements ActionListener{
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		MafViewer.isOpen=false;
+		MafViewer.setOpen(false);
 		try{
 			if (e.getActionCommand().equals("delete")){
-				short x = (short) ((MafViewer.pos.x - Map.getMapPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
-				short y = (short) ((MafViewer.pos.y - Map.getMapPos().y - Map.getMapOffset().y)  % Map.partMapHeight);        		
-				byte colNum = (byte) (Map.getStartCol() + (MafViewer.pos.x - Map.getMapPos().x - Map.getMapOffset().x) / Map.partMapWidth );
-				byte rowNum = (byte) (Map.getStartRow() + (MafViewer.pos.y - Map.getMapPos().y - Map.getMapOffset().y) / Map.partMapHeight);
+				short x = (short) ((MafViewer.getPos().x - MapPanel.getPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
+				short y = (short) ((MafViewer.getPos().y - MapPanel.getPos().y - Map.getMapOffset().y)  % Map.partMapHeight);        		
+				byte colNum = (byte) (Map.getStartCol() + (MafViewer.getPos().x - MapPanel.getPos().x - Map.getMapOffset().x) / Map.partMapWidth );
+				byte rowNum = (byte) (Map.getStartRow() + (MafViewer.getPos().y - MapPanel.getPos().y - Map.getMapOffset().y) / Map.partMapHeight);
 				DBManager.deleteMaf(x, y, colNum, rowNum);
 				MafHashKey key = new MafHashKey(colNum, rowNum);
-	      		if (AppGUI.mafs.containsKey(key)){
-	      			ArrayList<MafHashValue> list = AppGUI.mafs.get(key);
+	      		if (AppGUI.getMafs().containsKey(key)){
+	      			ArrayList<MafHashValue> list = AppGUI.getMafs().get(key);
 	      			if (list.size() == 1){
-	      				AppGUI.mafs.remove(key);	      				
+	      				AppGUI.getMafs().remove(key);	      				
 	      			}
 	      			else {
 	      				MafHashValue coord = new MafHashValue(x, y, false);
@@ -38,15 +40,14 @@ public class MafViewerOkButtonListener implements ActionListener{
 	      	  					break;
 	      	  				}
 	      		}
-	      		if (AppGUI.mapPanel.movingAdapt.clickedMaf != null)
-	    	    	AppGUI.mapPanel.movingAdapt.clickedMaf = null;
+	      		if (AppGUI.getClickedMaf() != null)
+	    	    	AppGUI.setClickedMaf(null);
 	      		AppGUI.loadPartsMap(Map.getPngScale(), 
 					colNum, rowNum, (byte) 1, (byte) 1,
 					Map.getMapOffset().x + (colNum-Map.getStartCol())*Map.partMapWidth,
 					Map.getMapOffset().y + (rowNum-Map.getStartRow())*Map.partMapHeight);
 	      		}			
-	    		AppGUI.mainFrame.setEnabled(true);
-				MafViewer.frame.dispose();   
+	      		MafViewer.closeMafViewer();  
 			}else{
 				Maf maf;
 				if (MafViewer.subjectName.getText().isEmpty())  {
@@ -56,10 +57,10 @@ public class MafViewerOkButtonListener implements ActionListener{
 						    JOptionPane.ERROR_MESSAGE);
 				}
 				else{
-					short x = (short) ((MafViewer.pos.x - Map.getMapPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
-					short y = (short) ((MafViewer.pos.y - Map.getMapPos().y - Map.getMapOffset().y)  % Map.partMapHeight);        		
-					byte colNum = (byte) (Map.getStartCol() + (MafViewer.pos.x - Map.getMapPos().x - Map.getMapOffset().x) / Map.partMapWidth );
-					byte rowNum = (byte) (Map.getStartRow() + (MafViewer.pos.y - Map.getMapPos().y - Map.getMapOffset().y) / Map.partMapHeight);
+					short x = (short) ((MafViewer.getPos().x - MapPanel.getPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
+					short y = (short) ((MafViewer.getPos().y - MapPanel.getPos().y - Map.getMapOffset().y)  % Map.partMapHeight);        		
+					byte colNum = (byte) (Map.getStartCol() + (MafViewer.getPos().x - MapPanel.getPos().x - Map.getMapOffset().x) / Map.partMapWidth );
+					byte rowNum = (byte) (Map.getStartRow() + (MafViewer.getPos().y - MapPanel.getPos().y - Map.getMapOffset().y) / Map.partMapHeight);
 				
 					maf = new Maf(x, y, colNum, rowNum, 
 							MafViewer.subjectName.getText().trim(), 
@@ -76,8 +77,8 @@ public class MafViewerOkButtonListener implements ActionListener{
 					if (e.getActionCommand().equals("update")){				
 						DBManager.updateMaf(maf);
 						MafHashKey key = new MafHashKey(colNum, rowNum);
-			      		if (AppGUI.mafs.containsKey(key)){
-			      			ArrayList<MafHashValue> list = AppGUI.mafs.get(key);
+			      		if (AppGUI.getMafs().containsKey(key)){
+			      			ArrayList<MafHashValue> list = AppGUI.getMafs().get(key);
 			      			MafHashValue coord = new MafHashValue(x, y, maf.isFull());
 			      	  			for (MafHashValue value:list)
 			      	  				if (coord.equals(value)){
@@ -85,18 +86,17 @@ public class MafViewerOkButtonListener implements ActionListener{
 			      	  					break;
 			      	  				}
 			      		}		      	 
-			      	if (AppGUI.mapPanel.movingAdapt.clickedMaf != null)
-			      		AppGUI.mapPanel.movingAdapt.clickedMaf = maf;		      	
+			      	if (AppGUI.getClickedMaf() != null)
+			      		AppGUI.setClickedMaf(maf);		      	
 					}
 					else{			
 						DBManager.insertMaf(maf);
 						if (maf.isFull())
-							AppGUI.paintMaf(AppConfig.signFull,true,maf);
+							AppGUI.paintClickedMaf(AppConfig.signFull,true);
 						else 
-							AppGUI.paintMaf(AppConfig.sign,true,maf);
+							AppGUI.paintClickedMaf(AppConfig.sign,true);
 					}
-					AppGUI.mainFrame.setEnabled(true);
-					MafViewer.frame.dispose();   
+					MafViewer.closeMafViewer();
 				}
 			}
 		} catch (SQLException ex){

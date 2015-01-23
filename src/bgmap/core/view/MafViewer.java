@@ -2,7 +2,6 @@ package bgmap.core.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -31,36 +30,49 @@ import bgmap.core.model.Map;
 public class MafViewer extends JFrame {
 
 	public static JFrame frame;	
-    public static JTextField subjectName;
+	public static JTextField subjectName;
+	public static JTextField subjectAddress;
+	public static DecimalTextField subjectRegNum;
+	public static JTextField telephone;
+	public static JFormattedTextField site;  
+	public static JTextField purpose; 
+	public static JTextField objectAddress;
+	public static JTextField techCharacteristics; 
+	public static JTextField passport;
+	public static JTextField personFullName;
+	
+    private static MafViewerOkButtonListener OkButtonListener= new MafViewerOkButtonListener();      
+    private static MafViewerCancelListener Cancelistener= new MafViewerCancelListener(); 		
     private static JLabel subjectNameLabel = new JLabel("<html><div align=center>" + Maf.SubjectNameField + "</div></html>", SwingConstants.CENTER);
-    public static JTextField subjectAddress;
     private static JLabel subjectAddressLabel = new JLabel("<html><div align=center>" + Maf.ObjectAddressField + "</div></html>", SwingConstants.CENTER);
-    public static DecimalTextField subjectRegNum;
     private static JLabel subjectRegNumLabel = new JLabel("<html><div align=center>" + Maf.SubjectRegNumField + "</div></html>", SwingConstants.CENTER);
-    public static JTextField telephone;
-    private static JLabel telephoneLabel = new JLabel("<html><div align=center>" + Maf.TelephoneField + "</div></html>", SwingConstants.CENTER);
-    public static JFormattedTextField site;    
+    private static JLabel telephoneLabel = new JLabel("<html><div align=center>" + Maf.TelephoneField + "</div></html>", SwingConstants.CENTER);    
     private static JLabel siteLabel = new JLabel("<html><div align=center>" + Maf.SiteField + "</div></html>", SwingConstants.CENTER);
-    public static JTextField purpose;
     private static JLabel purposeLabel = new JLabel("<html><div align=center>" + Maf.PurposeField + "</div></html>", SwingConstants.CENTER);
-    public static JTextField objectAddress;
     private static JLabel objectAddressLabel = new JLabel("<html><div align=center>" + Maf.ObjectAddressField + "</div></html>", SwingConstants.CENTER);
-    public static JTextField techCharacteristics; 
     private static JLabel techCharacteristicsLabel = new JLabel("<html> <div align=center>" + Maf.TechCharacteristicsField + "</div></html>", SwingConstants.CENTER);
-    public static JTextField passport;
     private static JLabel passportLabel = new JLabel("<html><div align=center>" + Maf.PassportField + "</div></html>", SwingConstants.CENTER);
-    public static JTextField personFullName;
-    private static JLabel personFullNameLabel = new JLabel("<html><div align=center>" + Maf.PersonFullNameField + "</div></html>", SwingConstants.CENTER);
-    static public Point pos = null;
-    
-    public static boolean isOpen = false;
+    private static JLabel personFullNameLabel = new JLabel("<html><div align=center>" + Maf.PersonFullNameField + "</div></html>", SwingConstants.CENTER);  
 	private static Color color = new Color(238,238,238,100);
 	
-    static MafViewerOkButtonListener OkButtonListener= new MafViewerOkButtonListener();
-      
-    static MafViewerCancelListener Cancelistener= new MafViewerCancelListener();       
-            
+    private static boolean isOpen = false;
+    private static Point pos = null;
     
+	public static boolean isOpen() {
+		return MafViewer.isOpen;
+	}
+
+	public static void setOpen(boolean isOpen) {
+		MafViewer.isOpen = isOpen;
+	}
+	
+	public static Point getPos() {
+		return MafViewer.pos;
+	}
+	public static void setPos(Point pos) {
+		MafViewer.pos = pos;
+	}
+       
     private static void initEditorFrame(){
         AppGUI.mainFrame.setEnabled(false);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -80,7 +92,6 @@ public class MafViewer extends JFrame {
         
         frame.setLocation(p);
         ((JComponent) frame.getContentPane()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-        frame.repaint();
         frame.setVisible(true);		
         isOpen=true;
     }
@@ -90,15 +101,22 @@ public class MafViewer extends JFrame {
         frame.setAlwaysOnTop(true);
         frame.setUndecorated(true);
         frame.setBackground(color);
-        frame.setResizable(false);
+//        frame.setResizable(false);
         frame.addWindowListener(Cancelistener);	        
-        frame.setSize(300, 200); 
+        frame.setSize(300, 250); 
         frame.setLocation(MouseInfo.getPointerInfo().getLocation());
         ((JComponent) frame.getContentPane()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-        frame.repaint();
         frame.setVisible(true);		
         isOpen=true;        
     }
+    
+    public static void closeMafViewer(){
+    	if (isOpen){
+    		AppGUI.mainFrame.setEnabled(true);
+			MafViewer.frame.dispose();   		
+			isOpen=false;
+    	}
+	}
     
 	public static void createEditor() {
 		if (!isOpen){
@@ -144,7 +162,7 @@ public class MafViewer extends JFrame {
 		    personFullName.addActionListener(OkButtonListener);
 		    personFullName.addKeyListener(Cancelistener);		 
 			        
-			pos = AppGUI.mapPanel.getMousePosition();      
+			pos=AppGUI.mapPanel.getMousePosition();      
 			
 			JPanel topPanel = new JPanel();        
 			topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
@@ -201,63 +219,63 @@ public class MafViewer extends JFrame {
 		}		
 	}
 	
-	public static void editMaf(Maf maf){
+	public static void editClickedMaf(){
 		if (!isOpen){
 			frame = new JFrame("Изменить МАФ");
 			
-			subjectName = new JTextField(maf.getSubjectName());
+			subjectName = new JTextField(AppGUI.getClickedMaf().getSubjectName());
 			subjectName.addActionListener(OkButtonListener);
 			subjectName.addKeyListener(Cancelistener);	
 			subjectName.setActionCommand("update");
 			
-			subjectAddress = new JTextField(maf.getSubjectAddress());
+			subjectAddress = new JTextField(AppGUI.getClickedMaf().getSubjectAddress());
 			subjectAddress.addActionListener(OkButtonListener);
 			subjectAddress.addKeyListener(Cancelistener);
 			subjectAddress.setActionCommand("update");
 	
-			subjectRegNum = new DecimalTextField(maf.getSubjectRegNum());	    
+			subjectRegNum = new DecimalTextField(AppGUI.getClickedMaf().getSubjectRegNum());	    
 		    subjectRegNum.addActionListener(OkButtonListener);
 		    subjectRegNum.addKeyListener(Cancelistener);
 		    subjectAddress.setActionCommand("update");
 		    
-		    telephone = new JTextField(maf.getTelephone());
+		    telephone = new JTextField(AppGUI.getClickedMaf().getTelephone());
 		    telephone.addActionListener(OkButtonListener);
 		    telephone.addKeyListener(Cancelistener);
 		    telephone.setActionCommand("update");
 	
 		    site = new JFormattedTextField(new RegexFormatter("www.[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"));
-		    site.setText(maf.getSite());
+		    site.setText(AppGUI.getClickedMaf().getSite());
 		    site.addActionListener(OkButtonListener);
 		    site.addKeyListener(Cancelistener);
 		    site.setActionCommand("update");
 
-		    purpose = new JTextField(maf.getPurpose());
+		    purpose = new JTextField(AppGUI.getClickedMaf().getPurpose());
 		    purpose.addActionListener(OkButtonListener);
 		    purpose.addKeyListener(Cancelistener);
 		    purpose.setActionCommand("update");
 
-		    objectAddress = new JTextField(maf.getObjectAddress());
+		    objectAddress = new JTextField(AppGUI.getClickedMaf().getObjectAddress());
 		    objectAddress.addKeyListener(Cancelistener);
 		    objectAddress.addActionListener(OkButtonListener);
 		    objectAddress.setActionCommand("update");
 
-		    techCharacteristics = new JTextField(maf.getTechCharacteristics());
+		    techCharacteristics = new JTextField(AppGUI.getClickedMaf().getTechCharacteristics());
 		    techCharacteristics.addActionListener(OkButtonListener);
 		    techCharacteristics.addKeyListener(Cancelistener);
 		    techCharacteristics.setActionCommand("update");
 		        
-		    passport = new JTextField(maf.getPassport());
+		    passport = new JTextField(AppGUI.getClickedMaf().getPassport());
 		    passport.addActionListener(OkButtonListener);
 		    passport.addKeyListener(Cancelistener);
 		    passport.setActionCommand("update");
 	
-		    personFullName = new JTextField(maf.getPersonFullName());
+		    personFullName = new JTextField(AppGUI.getClickedMaf().getPersonFullName());
 		    personFullName.addActionListener(OkButtonListener);
 		    personFullName.addKeyListener(Cancelistener);
 		    personFullName.setActionCommand("update");			        
 				    
-			pos = new Point(maf.getX() + (maf.getColNum()-Map.getStartCol())*Map.partMapWidth + Map.getMapPos().x + Map.getMapOffset().x,
-					maf.getY() + (maf.getRowNum()-Map.getStartRow())*Map.partMapHeight + Map.getMapPos().y + Map.getMapOffset().y);			
+			pos = new Point(AppGUI.getClickedMaf().getX() + (AppGUI.getClickedMaf().getColNum()-Map.getStartCol())*Map.partMapWidth + MapPanel.getPos().x + Map.getMapOffset().x,
+					AppGUI.getClickedMaf().getY() + (AppGUI.getClickedMaf().getRowNum()-Map.getStartRow())*Map.partMapHeight + MapPanel.getPos().y + Map.getMapOffset().y);			
 
 	        JPanel topPanel = new JPanel();        
 	        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
@@ -321,31 +339,31 @@ public class MafViewer extends JFrame {
 	}
 		
 		
-	public static void showMafInfo(Maf maf){
+	public static void showClickedMafInfo(){
 			if (!isOpen){
 				frame = new JFrame("Информация о МАФе");
 				
-				JLabel subjectName = new JLabel(maf.getSubjectName());								
-				JLabel subjectAddress = new JLabel(maf.getSubjectAddress());		
-				JLabel subjectRegNum = new JLabel(Integer.toString(maf.getSubjectRegNum()));	    			   
-				JLabel telephone = new JLabel(maf.getTelephone());
-			    JLabel site = new JLabel(maf.getSite());
-			    JLabel purpose = new JLabel(maf.getPurpose());
-			    JLabel objectAddress = new JLabel(maf.getObjectAddress());
-			    JLabel techCharacteristics = new JLabel(maf.getTechCharacteristics());		        
-			    JLabel passport = new JLabel(maf.getPassport());
-			    JLabel personFullName = new JLabel(maf.getPersonFullName());	        
+				JLabel subjectName = new JLabel(AppGUI.getClickedMaf().getSubjectName());								
+				JLabel subjectAddress = new JLabel(AppGUI.getClickedMaf().getSubjectAddress());		
+				JLabel subjectRegNum = new JLabel(Integer.toString(AppGUI.getClickedMaf().getSubjectRegNum()));	    			   
+				JLabel telephone = new JLabel(AppGUI.getClickedMaf().getTelephone());
+			    JLabel site = new JLabel(AppGUI.getClickedMaf().getSite());
+			    JLabel purpose = new JLabel(AppGUI.getClickedMaf().getPurpose());
+			    JLabel objectAddress = new JLabel(AppGUI.getClickedMaf().getObjectAddress());
+			    JLabel techCharacteristics = new JLabel(AppGUI.getClickedMaf().getTechCharacteristics());		        
+			    JLabel passport = new JLabel(AppGUI.getClickedMaf().getPassport());
+			    JLabel personFullName = new JLabel(AppGUI.getClickedMaf().getPersonFullName());	        
 					    
-				pos = new Point(maf.getX() + (maf.getColNum()-Map.getStartCol())*Map.partMapWidth + Map.getMapPos().x + Map.getMapOffset().x,
-						maf.getY() + (maf.getRowNum()-Map.getStartRow())*Map.partMapHeight + Map.getMapPos().y + Map.getMapOffset().y);			
+				pos = new Point(AppGUI.getClickedMaf().getX() + (AppGUI.getClickedMaf().getColNum()-Map.getStartCol())*Map.partMapWidth + MapPanel.getPos().x + Map.getMapOffset().x,
+						AppGUI.getClickedMaf().getY() + (AppGUI.getClickedMaf().getRowNum()-Map.getStartRow())*Map.partMapHeight + MapPanel.getPos().y + Map.getMapOffset().y);			
 
 		        JPanel topPanel = new JPanel();   		       
 		        topPanel.add(subjectName);
 		        subjectName.setFont(new Font(subjectName.getFont().getFontName(), Font.PLAIN, 15));
-		        topPanel.setSize(500, 50);	
+		        topPanel.setSize(300, 50);	
 		        
 		        JPanel bottomPanel = new JPanel();
-		        bottomPanel.setSize(500, 150);	
+		        bottomPanel.setSize(300, 200);	
 		        GridBagLayout gbl = new GridBagLayout();
 		        bottomPanel.setLayout(gbl);		        
 		        GridBagConstraints c =  new GridBagConstraints();
@@ -388,4 +406,6 @@ public class MafViewer extends JFrame {
 		        initViewerFrame();
 			}	
 	}
+
+
 }
