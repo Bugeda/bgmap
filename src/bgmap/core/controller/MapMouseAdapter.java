@@ -13,6 +13,7 @@ import javax.swing.event.MouseInputListener;
 
 import bgmap.core.AdminPanelStatus;
 import bgmap.core.AppConfig;
+import bgmap.core.MafsMarks;
 import bgmap.core.model.Maf;
 import bgmap.core.model.MafHashKey;
 import bgmap.core.model.MafHashValue;
@@ -52,10 +53,7 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 	 
     @Override
     public void mousePressed(MouseEvent e) {
-    	if (MafViewer.isOpen()) {
-			MafViewer.frame.dispose();   		
-			MafViewer.setOpen(false);
-		}
+    	MafViewer.closeMafViewer();
       	AppGUI.slider.setValue(100);
       	setMoveFrom(e.getPoint());         
       	AppGUI.mapPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
@@ -87,24 +85,19 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
   		//repaint selected maf
 		if (AppGUI.getClickedMaf()!=null){
 			MafViewer.closeMafViewer();
-			
-			if (AppGUI.getClickedMaf().isFull())					
-				 AppGUI.paintClickedMaf(AppConfig.signFull, false);								
-			  else 				  					 	
-				 AppGUI.paintClickedMaf(AppConfig.sign, false);
+			AppGUI.paintClickedMaf(AppGUI.getClickedMaf().getMafMark().img, false);
 		}
 		//check if exist maf
 		if (e.getClickCount() == 1){
 			AppGUI.setClickedMaf(null);
     		short x = (short) ((e.getX() - MapPanel.getPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
     		short y = (short) ((e.getY() - MapPanel.getPos().y - Map.getMapOffset().y)  % Map.partMapHeight); 
-    		boolean isFull = false;
     		byte colNum = (byte) (Map.getStartCol() + (e.getX() - MapPanel.getPos().x - Map.getMapOffset().x) / Map.partMapWidth );
     		byte rowNum = (byte) (Map.getStartRow() + (e.getY() - MapPanel.getPos().y - Map.getMapOffset().y) / Map.partMapHeight);
       		MafHashKey cell = new MafHashKey(colNum, rowNum);
       		if (AppGUI.getMafs().containsKey(cell)){
       			ArrayList<MafHashValue> list = AppGUI.getMafs().get(cell);
-      			MafHashValue coord = new MafHashValue(x, y, isFull);
+      			MafHashValue coord = new MafHashValue(x, y, MafsMarks.SIGNNEW);
       	  			for (MafHashValue value:list){
       	  				if (coord.equals(value)){
       	  					try {
@@ -125,13 +118,13 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 				MafViewer.createEditor();
 			else 		 		    	 
 		      	if (AppGUI.getClickedMaf()!=null){		      		
-		      		AppGUI.paintClickedMaf(AppConfig.signOn, false);				    
+		      		AppGUI.paintClickedMaf(MafsMarks.SIGNON.img, false);		    
 		      		MafViewer.editClickedMaf();		      		
 		      	}
 		}
 		else {
 			if (AppGUI.getClickedMaf()!=null) {
-		  		AppGUI.paintClickedMaf(AppConfig.signOn, false);
+				AppGUI.paintClickedMaf(MafsMarks.SIGNON.img, false);		  		
 	    		MafViewer.showClickedMafInfo();		
 			}
 		}		

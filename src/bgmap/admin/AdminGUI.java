@@ -17,7 +17,7 @@ import bgmap.core.view.MapPanel;
 
 public class AdminGUI extends AppGUI {
 	public static void main(String[] args){
-		AppConfig.setConfig(false);			
+		AppConfig.setConfig(false, true);		
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	            public void run() {
 	            		createAndShowGUI((byte)1,(byte)50,(byte)23);

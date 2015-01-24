@@ -3,6 +3,7 @@ package bgmap.core.model.dao;
 import java.sql.*;
 import java.util.ArrayList;
 
+import bgmap.core.MafsMarks;
 import bgmap.core.AppConfig;
 import bgmap.core.model.Maf;
 import bgmap.core.model.MafHashKey;
@@ -154,7 +155,8 @@ public class DBManager {
 				if (!result.containsKey(key))
 					result.put(key, new ArrayList<MafHashValue>());
 				ArrayList<MafHashValue> list = result.get(key);
-				list.add(new MafHashValue(rs.getShort("x"), rs.getShort("y"), Boolean.parseBoolean(rs.getString("isFull"))));
+				
+				list.add(new MafHashValue(rs.getShort("x"), rs.getShort("y"), MafsMarks.getFullMark(Boolean.parseBoolean(rs.getString("isFull")))));
 				result.setMafValue(list);
 			}
 

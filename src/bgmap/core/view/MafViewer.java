@@ -58,14 +58,6 @@ public class MafViewer extends JFrame {
     private static boolean isOpen = false;
     private static Point pos = null;
     
-	public static boolean isOpen() {
-		return MafViewer.isOpen;
-	}
-
-	public static void setOpen(boolean isOpen) {
-		MafViewer.isOpen = isOpen;
-	}
-	
 	public static Point getPos() {
 		return MafViewer.pos;
 	}
@@ -111,7 +103,7 @@ public class MafViewer extends JFrame {
     }
     
     public static void closeMafViewer(){
-    	if (isOpen){
+    	if (isOpen){    		
     		AppGUI.mainFrame.setEnabled(true);
 			MafViewer.frame.dispose();   		
 			isOpen=false;

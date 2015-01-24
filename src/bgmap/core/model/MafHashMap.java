@@ -6,8 +6,8 @@ import java.util.HashMap;
 public class MafHashMap extends HashMap<MafHashKey, ArrayList<MafHashValue>>{
 
 	private MafHashKey mafKey;	
-	private ArrayList<MafHashValue> mafValue;
-
+	private ArrayList<MafHashValue> mafValue;	
+	
 	public MafHashKey getMafKey() {
 		return mafKey;
 	}

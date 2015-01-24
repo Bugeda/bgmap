@@ -17,6 +17,8 @@ import java.util.Map.Entry;
 
 import javax.swing.*;
 
+import org.eclipse.swt.internal.win32.PAINTSTRUCT;
+
 import bgmap.core.AdminPanelStatus;
 import bgmap.core.AppConfig;
 import bgmap.core.model.*;
@@ -33,6 +35,9 @@ public class AppGUI {
 	public static MapPanel mapPanel = null;
 	private static MafHashMap mafs =  new MafHashMap(); 
 	private static Maf clickedMaf;
+	private static byte startColumn, startRow;
+	private static byte columnCount,rowCount;
+	private static int drawX, drawY;
 
 	public static MafHashMap getMafs() {
 		return mafs;
@@ -62,20 +67,35 @@ public class AppGUI {
 	 * and scale.
 	 * 
 	 */
-	public static void loadPartsMap(byte scale, byte startColumn, byte startRow, byte columnCount, byte rowCount, int drawX, int drawY){
+	public static void loadPartsMap(byte scale, byte startColumn, byte startRow, byte columnCount, byte rowCount, int drawX, int drawY){		
 				byte dx;
-	    		byte dy=startRow;    		
+	    		byte dy=startRow;   
+	    		Thread[] threads = null;
+	    		int tNum = 0;
 	            for(byte y=0; y < rowCount; y++ ) {        
 	            	dx=startColumn;
 	            	for(byte x=0; x < columnCount; x ++ ) { 
 	            		Runnable r = new ThreadMapPart(dx, dy, x, y, drawX, drawY);
-	            		Thread t = new Thread(r);
+	            		Thread t = new Thread(r);	            		
 	            		t.setPriority(Thread.MAX_PRIORITY);
-	            		t.start();	      
+	            	//	threads[tNum] = t;
+	            		t.start();
+	            		//tNum++;
 	            		dx++;
 	                }
 	            	dy++;
-	            }        	  	
+	            } 
+	          /*  for ( Thread t : threads )
+					try {
+						t.join();
+					} catch (InterruptedException e) {
+						AppConfig.lgTRACE.error(e);
+			            AppConfig.lgWARN.error(e);
+			            System.exit(0);	 
+					}
+	    		repaintMafs(scale, startColumn, startRow, columnCount, rowCount, drawX, drawY);
+	    		*/  
+	            
 	}
 	
 	/**
@@ -120,17 +140,11 @@ public class AppGUI {
 			  Entry<MafHashKey, ArrayList<MafHashValue>> thisEntry = it.next();
 			  MafHashKey key = thisEntry.getKey();	
 			  ArrayList<MafHashValue> value = thisEntry.getValue();
-			  for (MafHashValue vl:value){
-				  if (vl.isFull())					   	  
-					  g.drawImage(AppConfig.signFull, 
-			    				Map.partMapWidth * (key.getCol() - startColumn) + vl.getX() - AppConfig.signFull.getWidth(null)/2,
-			    				Map.partMapHeight * (key.getRow() - startRow) + vl.getY() - AppConfig.signFull.getHeight(null),
-			    				AppConfig.signFull.getWidth(null), AppConfig.signFull.getHeight(null), null);				
-				  else 				  					 
-					  g.drawImage(AppConfig.sign, 
-			    				Map.partMapWidth * (key.getCol() - startColumn) + vl.getX() - AppConfig.sign.getWidth(null)/2,
-			    				Map.partMapHeight * (key.getRow() - startRow) + vl.getY() - AppConfig.sign.getHeight(null),
-			    				AppConfig.sign.getWidth(null), AppConfig.sign.getHeight(null), null);				  
+			  for (MafHashValue vl:value){							   	  
+					  g.drawImage(vl.getMafsMarks().img, 
+			    				Map.partMapWidth * (key.getCol() - startColumn) + vl.getX() - vl.getMafsMarks().img.getWidth(null)/2,
+			    				Map.partMapHeight * (key.getRow() - startRow) + vl.getY() - vl.getMafsMarks().img.getHeight(null),
+			    				vl.getMafsMarks().img.getWidth(null), vl.getMafsMarks().img.getHeight(null), null);								  				  
 			  }
 		}	            	         
 		g.dispose();		
@@ -142,7 +156,6 @@ public class AppGUI {
     }
 	/**
 	 * Read mafs from db and load them into MafHashMap
-	 * @return 
 	 */
 	public static void readHashMaf(byte col1, byte col2, byte row1, byte row2){
 		try {	
@@ -160,7 +173,9 @@ public class AppGUI {
             System.exit(1);	 
 		}
 	}
-	
+	/**
+	 * repaint map when drag&drop
+	 */
 	public static void repaintMap(){
 		if ((mapPanel.getOffset().x!=0)||(mapPanel.getOffset().y!=0)){
 			Image newImage = new BufferedImage(Map.getSize().width,Map.getSize().height, BufferedImage.TYPE_INT_RGB);			
@@ -236,7 +251,8 @@ public class AppGUI {
 				AppConfig.lgDEBUG.debug("COUNT" +  Map.COL_COUNT+ "," + Map.ROW_COUNT);
 				AppConfig.lgDEBUG.debug("lefttopCorner = " +  leftTopCol+ "," + topLeftRow);
 			}
-			
+			ThreadMapPart.setMapPartCounts(Math.abs(addColCount)*Map.ROW_COUNT + (Map.COL_COUNT + 1)*Math.abs(addRowCount)) ;
+	
 			//paint left side			
 			if (signMoveX > 0){		
 				readHashMaf(
@@ -245,8 +261,11 @@ public class AppGUI {
 						(byte)(topLeftRow + addRowCount*signMoveY), 
 						(byte)(topLeftRow + addRowCount*signMoveY+Map.ROW_COUNT - 1));
 				loadPartsMap(Map.getPngScale(), 
-						(byte) (leftTopCol), (byte) (topLeftRow + addRowCount*signMoveY), (byte) (Math.abs(addColCount)), (byte) (Map.ROW_COUNT), 
-						leftPartCellWidth,upPartCellHeight+hRows*(signMoveY));				
+						(byte) (leftTopCol), 
+						(byte) (topLeftRow + addRowCount*signMoveY), 
+						(byte) (Math.abs(addColCount)), 
+						(byte) (Map.ROW_COUNT), 
+						leftPartCellWidth,upPartCellHeight+hRows*(signMoveY));
 			} 
 			//paint right side
 			else {					
@@ -256,7 +275,10 @@ public class AppGUI {
 						(byte)(topLeftRow + addRowCount*signMoveY), 
 						(byte)(topLeftRow + addRowCount*signMoveY+Map.ROW_COUNT - 1));
 				loadPartsMap(Map.getPngScale(), 
-						(byte) (leftTopCol + Map.COL_COUNT - (1  + addColCount)*rightCol), (byte) (topLeftRow + addRowCount*signMoveY), (byte) (Math.abs(addColCount)), (byte) (Map.ROW_COUNT), 
+						(byte) (leftTopCol + Map.COL_COUNT - (1  + addColCount)*rightCol), 
+						(byte) (topLeftRow + addRowCount*signMoveY), 
+						(byte) (Math.abs(addColCount)), 
+						(byte) (Map.ROW_COUNT), 
 						Map.getSize().width - wCols + rightPartCellWidth, upPartCellHeight + hRows * (signMoveY));		
 			}  
 			//paint top side
@@ -267,8 +289,11 @@ public class AppGUI {
 						(byte)(topLeftRow), 
 						(byte)(topLeftRow + Math.abs(addRowCount) - 1));
 				loadPartsMap(Map.getPngScale(), 
-						(byte) (leftTopCol), (byte) (topLeftRow),(byte) (Map.COL_COUNT + 1),  (byte) (Math.abs(addRowCount)), 
-						leftPartCellWidth, upPartCellHeight);					
+						(byte) (leftTopCol), 
+						(byte) (topLeftRow),
+						(byte) (Map.COL_COUNT + 1),
+						(byte) (Math.abs(addRowCount)), 
+						leftPartCellWidth, upPartCellHeight);						
 			}
 			//paint down side
 			else{	
@@ -278,8 +303,11 @@ public class AppGUI {
 						(byte)(topLeftRow + Map.ROW_COUNT - (1 + addRowCount)*downRow), 
 						(byte)(topLeftRow + Map.ROW_COUNT - (1 + addRowCount)*downRow + Math.abs(addRowCount) - 1));
 				loadPartsMap(Map.getPngScale(), 
-						(byte) (leftTopCol), (byte) (topLeftRow + Map.ROW_COUNT - (1 + addRowCount)*downRow), (byte) (Map.COL_COUNT + 1), (byte) (Math.abs(addRowCount)), 
-						leftPartCellWidth, Map.getSize().height - hRows + downPartCellHeight);		
+						(byte) (leftTopCol), 
+						(byte) (topLeftRow + Map.ROW_COUNT - (1 + addRowCount)*downRow), 
+						(byte) (Map.COL_COUNT + 1), 
+						(byte) (Math.abs(addRowCount)), 
+						leftPartCellWidth, Map.getSize().height - hRows + downPartCellHeight);				
 			}			
 			
 			//remove excess mafs from mafs HashMap
@@ -301,12 +329,18 @@ public class AppGUI {
 		}
 
 	}	
+	/**
+	 * paint all HashMap mafs when map has been repaint
+	 */
+	public static void repaintMafs(byte scale, byte startColumn, byte startRow, byte columnCount, byte rowCount, int drawX, int drawY){		
 	
-
+	}
+	
 	/**
 	 * paint ClickedMaf
 	 */		
 	public static void paintClickedMaf(Image sign, boolean isNew){	
+
 		Graphics g = Map.getImage().getGraphics();  		
 		g.drawImage(sign, 
 				Map.getMapOffset().x+Map.partMapWidth*(clickedMaf.getColNum()-Map.getStartCol())+clickedMaf.getX() - sign.getWidth(null)/2,
@@ -317,7 +351,7 @@ public class AppGUI {
 			if (!getMafs().containsKey(key))
 				getMafs().put(key, new ArrayList<MafHashValue>());
 			ArrayList<MafHashValue> list = getMafs().get(key);
-			list.add(new MafHashValue((short)clickedMaf.getX(), (short)clickedMaf.getY(), clickedMaf.isFull()));
+			list.add(new MafHashValue((short)clickedMaf.getX(), (short)clickedMaf.getY(), clickedMaf.getMafMark()));
 			getMafs().setMafValue(list);
 			}
 		AppGUI.mapPanel.loadImage(Map.getImage());

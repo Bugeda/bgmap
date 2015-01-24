@@ -1,18 +1,20 @@
 package bgmap.core.model;
 
 import bgmap.core.AppConfig;
+import bgmap.core.MafsMarks;
 
 public class MafHashValue{
-	
-	public MafHashValue(short x, short y, boolean isFull) {		
-		this.x = x;
-		this.y = y;
-		this.isFull = isFull;
-	}
 
 	private short x;	
 	private short y;
-	private boolean isFull;
+	private MafsMarks mafsmark;
+	
+	public MafHashValue(short x, short y, MafsMarks mafsmark) {		
+		this.x = x;
+		this.y = y;
+		this.mafsmark = mafsmark;
+	}
+
 	
 	public int getX() {
 		return x;
@@ -30,12 +32,12 @@ public class MafHashValue{
 		this.y = y;
 	}
 
-	public boolean isFull() {
-		return isFull;
+	public MafsMarks getMafsMarks() {
+		return mafsmark;
 	}
 
-	public void setFull(boolean isFull) {
-		this.isFull = isFull;
+	public void setFull(MafsMarks mafsmark) {
+		this.mafsmark = mafsmark;
 	}	
 	
 	@Override
@@ -48,7 +50,7 @@ public class MafHashValue{
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj) {		
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -56,9 +58,9 @@ public class MafHashValue{
 		if (!(obj instanceof MafHashValue))
 			return false;
 		MafHashValue other = (MafHashValue) obj;
-		if (Math.abs(x - other.x) > AppConfig.sign.getWidth(null)/2 )
+		if (Math.abs(x - other.x) > other.mafsmark.img.getWidth(null)/2 )
 			return false;
-		if (( other.y - y > AppConfig.sign.getHeight(null))||(other.y - y < 0))
+		if (( other.y - y > other.mafsmark.img.getHeight(null))||(other.y - y < 0))
 			return false;
 		return true;
 	}

@@ -16,7 +16,7 @@ public class Divide {
 		
 		//29120 x 43680   
 		//320 x 480
-		AppConfig.setConfig(false);
+		AppConfig.setConfig(false, true);
 		//ViewMapTest ma = new ViewMapTest(srcMapPath+"p1.png");		
 	
 		 try {     

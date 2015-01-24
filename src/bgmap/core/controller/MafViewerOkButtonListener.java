@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import bgmap.core.AppConfig;
+import bgmap.core.MafsMarks;
 import bgmap.core.model.*;
 import bgmap.core.model.dao.DBManager;
 import bgmap.core.view.AppGUI;
@@ -17,8 +18,7 @@ import bgmap.core.view.MapPanel;
 public class MafViewerOkButtonListener implements ActionListener{
 	
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		MafViewer.setOpen(false);
+	public void actionPerformed(ActionEvent e) {		
 		try{
 			if (e.getActionCommand().equals("delete")){
 				short x = (short) ((MafViewer.getPos().x - MapPanel.getPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
@@ -33,7 +33,7 @@ public class MafViewerOkButtonListener implements ActionListener{
 	      				AppGUI.getMafs().remove(key);	      				
 	      			}
 	      			else {
-	      				MafHashValue coord = new MafHashValue(x, y, false);
+	      				MafHashValue coord = new MafHashValue(x, y, MafsMarks.SIGNNEW);
 	      	  			for (MafHashValue value:list)
 	      	  				if (coord.equals(value)){
 	      	  					list.remove(value);	      	  					
@@ -79,10 +79,10 @@ public class MafViewerOkButtonListener implements ActionListener{
 						MafHashKey key = new MafHashKey(colNum, rowNum);
 			      		if (AppGUI.getMafs().containsKey(key)){
 			      			ArrayList<MafHashValue> list = AppGUI.getMafs().get(key);
-			      			MafHashValue coord = new MafHashValue(x, y, maf.isFull());
+			      			MafHashValue coord = new MafHashValue(x, y, maf.getMafMark());
 			      	  			for (MafHashValue value:list)
 			      	  				if (coord.equals(value)){
-			      	  					value.setFull(maf.isFull());
+			      	  					value.setFull(maf.getMafMark());
 			      	  					break;
 			      	  				}
 			      		}		      	 
@@ -91,13 +91,12 @@ public class MafViewerOkButtonListener implements ActionListener{
 					}
 					else{			
 						DBManager.insertMaf(maf);
-						if (maf.isFull())
-							AppGUI.paintClickedMaf(AppConfig.signFull,true);
-						else 
-							AppGUI.paintClickedMaf(AppConfig.sign,true);
-					}
+						AppGUI.setClickedMaf(maf);						
+						AppGUI.paintClickedMaf(maf.getMafMark().img,true);
+					}	
 					MafViewer.closeMafViewer();
 				}
+				
 			}
 		} catch (SQLException ex){
 			JOptionPane.showMessageDialog(AppGUI.mainFrame,
