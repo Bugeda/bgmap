@@ -3,7 +3,6 @@ package bgmap.core.model.dao;
 import java.sql.*;
 import java.util.ArrayList;
 
-import bgmap.core.MafsMarks;
 import bgmap.core.AppConfig;
 import bgmap.core.model.Maf;
 import bgmap.core.model.MafHashKey;
@@ -98,7 +97,7 @@ public class DBManager {
 		if (readMaf((short)maf.getX(),(short) maf.getY(), maf.getColNum(), maf.getRowNum()) == null){
 			Connection conn = null;
 			Statement stmt = null;
-			String sql = "INSERT INTO bgmap(x, y, colNum, rowNum, subjectName, subjectAddress, subjectRegNum,"
+			String sql = "INSERT INTO bgmap (x, y, colNum, rowNum, subjectName, subjectAddress, subjectRegNum,"
 					+ "telephone, site, purpose, objectAddress, techCharacteristics, passport, personFullName)"
 					+ " VALUES('"+ 
 					maf.getX() + "','"+
@@ -142,7 +141,7 @@ public class DBManager {
 		String fromWhere= "from bgmap where colNum BETWEEN '"+colNum1+"' and '"+colNum12+"' and rowNum BETWEEN '"+rowNum1 +"' and '"+rowNum2+"'";
 		String sql = "select *, (CASE WHEN  (`subjectName` = \"\") OR (`subjectAddress` = \"\") OR(`subjectRegNum` = 0) OR(`telephone` = \"\") OR (`site` = \"\") "
 				+ "OR(`purpose` = \"\") OR (`objectAddress` = \"\") OR(`techCharacteristics` = \"\") OR (`passport` = \"\")  OR (`personFullName` = \"\") "
-						+ "THEN 'false' else 'true' end) as isFull " + fromWhere;
+						+ "THEN '0' else '1' end) as isFull " + fromWhere;
 	
 		try {
 			Class.forName(JDBC_DRIVER);
@@ -156,7 +155,7 @@ public class DBManager {
 					result.put(key, new ArrayList<MafHashValue>());
 				ArrayList<MafHashValue> list = result.get(key);
 				
-				list.add(new MafHashValue(rs.getShort("x"), rs.getShort("y"), MafsMarks.getFullMark(Boolean.parseBoolean(rs.getString("isFull")))));
+				list.add(new MafHashValue(rs.getShort("x"), rs.getShort("y"), rs.getByte("isFull")) );
 				result.setMafValue(list);
 			}
 

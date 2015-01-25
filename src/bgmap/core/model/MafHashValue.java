@@ -1,20 +1,18 @@
 package bgmap.core.model;
 
 import bgmap.core.AppConfig;
-import bgmap.core.MafsMarks;
 
 public class MafHashValue{
 
 	private short x;	
 	private short y;
-	private MafsMarks mafsmark;
+	private byte mafsmark;
 	
-	public MafHashValue(short x, short y, MafsMarks mafsmark) {		
+	public MafHashValue(short x, short y, byte mafsmark) {		
 		this.x = x;
 		this.y = y;
 		this.mafsmark = mafsmark;
 	}
-
 	
 	public int getX() {
 		return x;
@@ -32,11 +30,11 @@ public class MafHashValue{
 		this.y = y;
 	}
 
-	public MafsMarks getMafsMarks() {
+	public byte getMafsMarks() {
 		return mafsmark;
 	}
 
-	public void setFull(MafsMarks mafsmark) {
+	public void setFull(byte mafsmark) {
 		this.mafsmark = mafsmark;
 	}	
 	
@@ -58,10 +56,16 @@ public class MafHashValue{
 		if (!(obj instanceof MafHashValue))
 			return false;
 		MafHashValue other = (MafHashValue) obj;
-		if (Math.abs(x - other.x) > other.mafsmark.img.getWidth(null)/2 )
+		if (Math.abs(x - other.x) > AppConfig.MafsMarks[other.mafsmark].getWidth(null)/2 )
 			return false;
-		if (( other.y - y > other.mafsmark.img.getHeight(null))||(other.y - y < 0))
+		if (( other.y - y > AppConfig.MafsMarks[other.mafsmark].getHeight(null))||(other.y - y < 0))
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "MafHashValue [x=" + x + ", y=" + y + ", mafsmark=" + mafsmark
+				+ "]";
+	}		
 }

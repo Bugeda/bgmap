@@ -1,4 +1,4 @@
-package bgmap.admin;
+package bgmap.app.admin;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -8,15 +8,16 @@ import javax.imageio.ImageIO;
 
 import bgmap.core.*;
 import bgmap.core.model.*;
+import bgmap.core.view.AppGUI;
 
-public class Divide {	
+public class Divide extends AppGUI{	
 	public static final String srcMapPath = "src/images/src/";
 	
 	public static void main(String[] args) throws IOException {
 		
 		//29120 x 43680   
 		//320 x 480
-		AppConfig.setConfig(false, true);
+		AppConfig.setConfig(false, true, true);
 		//ViewMapTest ma = new ViewMapTest(srcMapPath+"p1.png");		
 	
 		 try {     

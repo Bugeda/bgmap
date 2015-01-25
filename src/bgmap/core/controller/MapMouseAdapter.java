@@ -2,26 +2,16 @@ package bgmap.core.controller;
 
 import java.awt.Cursor;
 import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.event.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.event.MouseInputListener;
 
-import bgmap.core.AdminPanelStatus;
-import bgmap.core.AppConfig;
-import bgmap.core.MafsMarks;
-import bgmap.core.model.Maf;
-import bgmap.core.model.MafHashKey;
-import bgmap.core.model.MafHashValue;
-import bgmap.core.model.Map;
+import static bgmap.core.AppConfig.*;
+import bgmap.core.model.*;
 import bgmap.core.model.dao.DBManager;
-import bgmap.core.view.AppGUI;
-import bgmap.core.view.MafViewer;
-import bgmap.core.view.MapPanel;
+import bgmap.core.view.*;
 
 public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener, MouseInputListener {
 
@@ -35,7 +25,7 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 	
 	private void setMoveTo(Point p){		   
 		if (startMovePoint!=null){
-			AppGUI.mapPanel.setOffset(new Point(p.x - startMovePoint.x, p.y - startMovePoint.y));			
+			MapPanel.setOffset(new Point(p.x - startMovePoint.x, p.y - startMovePoint.y));			
 			AppGUI.mapPanel.repaint();
 		}
 	}
@@ -85,7 +75,7 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
   		//repaint selected maf
 		if (AppGUI.getClickedMaf()!=null){
 			MafViewer.closeMafViewer();
-			AppGUI.paintClickedMaf(AppGUI.getClickedMaf().getMafMark().img, false);
+			AppGUI.paintClickedMaf(MafsMarks[AppGUI.getClickedMaf().getMafMark()], false);
 		}
 		//check if exist maf
 		if (e.getClickCount() == 1){
@@ -95,36 +85,38 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
     		byte colNum = (byte) (Map.getStartCol() + (e.getX() - MapPanel.getPos().x - Map.getMapOffset().x) / Map.partMapWidth );
     		byte rowNum = (byte) (Map.getStartRow() + (e.getY() - MapPanel.getPos().y - Map.getMapOffset().y) / Map.partMapHeight);
       		MafHashKey cell = new MafHashKey(colNum, rowNum);
-      		if (AppGUI.getMafs().containsKey(cell)){
-      			ArrayList<MafHashValue> list = AppGUI.getMafs().get(cell);
-      			MafHashValue coord = new MafHashValue(x, y, MafsMarks.SIGNNEW);
+      		if (AppGUI.getAllMafs().containsKey(cell)){
+      			ArrayList<MafHashValue> list = AppGUI.getAllMafs().get(cell);
+      			MafHashValue coord = new MafHashValue(x, y, (byte) 3);	
       	  			for (MafHashValue value:list){
       	  				if (coord.equals(value)){
       	  					try {
       	  						AppGUI.setClickedMaf(DBManager.readMaf((short)value.getX(),(short)value.getY(), colNum, rowNum));      	  					
     							break;							
     						} catch (SQLException e1) {
-    							AppConfig.lgTRACE.error(e1);
-    				            AppConfig.lgWARN.error(e1);
+    							lgTRACE.error(e1);
+    				            lgWARN.error(e1);
     				            System.exit(1);	
     						}  	  					
       	  				}
       	  			}
       	  		}
 		}
-		if (AdminPanelStatus.isEditMaf()){
+		if (bgmap.core.AppConfig.isAdmin()){
 			AppGUI.slider.setValue(100);
 			if (e.getClickCount() == 2) 
 				MafViewer.createEditor();
 			else 		 		    	 
-		      	if (AppGUI.getClickedMaf()!=null){		      		
-		      		AppGUI.paintClickedMaf(MafsMarks.SIGNON.img, false);		    
+		      	if (AppGUI.getClickedMaf()!=null){		
+		      		System.out.println("click");
+		      		AppGUI.paintClickedMaf(MafsMarks[2], false);	
 		      		MafViewer.editClickedMaf();		      		
 		      	}
 		}
 		else {
 			if (AppGUI.getClickedMaf()!=null) {
-				AppGUI.paintClickedMaf(MafsMarks.SIGNON.img, false);		  		
+				AppGUI.paintClickedMaf(MafsMarks[2], false);
+				System.out.println("click");
 	    		MafViewer.showClickedMafInfo();		
 			}
 		}		

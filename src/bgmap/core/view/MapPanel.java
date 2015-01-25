@@ -1,4 +1,5 @@
 package bgmap.core.view;
+
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +25,7 @@ public class MapPanel extends JPanel {
 			return offset;
 		}
 
-		public void setOffset(Point offset) {
+		public static void setOffset(Point offset) {
 			MapPanel.offset = offset;
 		}
 		public static Point getPos() {

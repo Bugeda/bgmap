@@ -49,5 +49,11 @@ public class MafHashKey {
 		if (row != other.row)
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "MafHashKey [col=" + col + ", row=" + row + "]";
 	}	
+	
 }

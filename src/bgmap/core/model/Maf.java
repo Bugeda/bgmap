@@ -1,7 +1,5 @@
 package bgmap.core.model;
 
-import bgmap.core.MafsMarks;
-
 /**
  * 1. полное наименование субъекта ведения хозяйства
  * 2. адрес субъекта ведения хозяйства
@@ -41,7 +39,7 @@ public class Maf {
 	private String techCharacteristics;
 	private String passport;
 	private String personFullName;
-	private MafsMarks mafMark;
+	private byte mafMark;
 	
 	public Maf(short x, short y, byte colNum, byte rowNum, String subjectName, String subjectAddress, int subjectRegNum,
 			String telephone, String site, String purpose,
@@ -62,7 +60,7 @@ public class Maf {
 		this.passport = passport;
 		this.personFullName = personFullName;
 		
-		if ((subjectName.length() == 0)||
+		this.mafMark = (byte) (((subjectName.length() == 0)||
 			(subjectAddress.length() == 0)||	
 			(subjectRegNum == 0)||
 			(telephone.length() == 0)||
@@ -71,9 +69,7 @@ public class Maf {
 			(objectAddress.length() == 0)||
 			(techCharacteristics.length() == 0)||
 			(passport.length() == 0)||
-			(personFullName.length() == 0))
-			this.mafMark = MafsMarks.SIGN;
-		else this.mafMark = MafsMarks.SIGNFULL;
+			(personFullName.length() == 0)) ? 0 : 1);
 	}
 	
 	public String getSubjectName() {
@@ -169,7 +165,7 @@ public class Maf {
 		this.y = y;
 	}
 
-	public MafsMarks getMafMark() {
+	public byte getMafMark() {
 		return mafMark;
 	}	
 }

@@ -8,12 +8,9 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import bgmap.core.AppConfig;
-import bgmap.core.MafsMarks;
 import bgmap.core.model.*;
 import bgmap.core.model.dao.DBManager;
-import bgmap.core.view.AppGUI;
-import bgmap.core.view.MafViewer;
-import bgmap.core.view.MapPanel;
+import bgmap.core.view.*;
 
 public class MafViewerOkButtonListener implements ActionListener{
 	
@@ -27,13 +24,13 @@ public class MafViewerOkButtonListener implements ActionListener{
 				byte rowNum = (byte) (Map.getStartRow() + (MafViewer.getPos().y - MapPanel.getPos().y - Map.getMapOffset().y) / Map.partMapHeight);
 				DBManager.deleteMaf(x, y, colNum, rowNum);
 				MafHashKey key = new MafHashKey(colNum, rowNum);
-	      		if (AppGUI.getMafs().containsKey(key)){
-	      			ArrayList<MafHashValue> list = AppGUI.getMafs().get(key);
+	      		if (AppGUI.getAllMafs().containsKey(key)){
+	      			ArrayList<MafHashValue> list = AppGUI.getAllMafs().get(key);
 	      			if (list.size() == 1){
-	      				AppGUI.getMafs().remove(key);	      				
+	      				AppGUI.getAllMafs().remove(key);	      				
 	      			}
 	      			else {
-	      				MafHashValue coord = new MafHashValue(x, y, MafsMarks.SIGNNEW);
+	      				MafHashValue coord = new MafHashValue(x, y, (byte) 2);
 	      	  			for (MafHashValue value:list)
 	      	  				if (coord.equals(value)){
 	      	  					list.remove(value);	      	  					
@@ -77,8 +74,8 @@ public class MafViewerOkButtonListener implements ActionListener{
 					if (e.getActionCommand().equals("update")){				
 						DBManager.updateMaf(maf);
 						MafHashKey key = new MafHashKey(colNum, rowNum);
-			      		if (AppGUI.getMafs().containsKey(key)){
-			      			ArrayList<MafHashValue> list = AppGUI.getMafs().get(key);
+			      		if (AppGUI.getAllMafs().containsKey(key)){
+			      			ArrayList<MafHashValue> list = AppGUI.getAllMafs().get(key);
 			      			MafHashValue coord = new MafHashValue(x, y, maf.getMafMark());
 			      	  			for (MafHashValue value:list)
 			      	  				if (coord.equals(value)){
@@ -92,7 +89,7 @@ public class MafViewerOkButtonListener implements ActionListener{
 					else{			
 						DBManager.insertMaf(maf);
 						AppGUI.setClickedMaf(maf);						
-						AppGUI.paintClickedMaf(maf.getMafMark().img,true);
+						AppGUI.paintClickedMaf(AppConfig.MafsMarks[maf.getMafMark()],true);
 					}	
 					MafViewer.closeMafViewer();
 				}

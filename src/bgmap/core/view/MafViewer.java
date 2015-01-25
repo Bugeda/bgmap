@@ -1,31 +1,13 @@
 package bgmap.core.view;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.MouseInfo;
-import java.awt.Point;
+import java.awt.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
-import bgmap.core.DecimalTextField;
-import bgmap.core.RegexFormatter;
-import bgmap.core.controller.MafViewerCancelListener;
-import bgmap.core.controller.MafViewerOkButtonListener;
-import bgmap.core.model.Maf;
+import bgmap.core.*;
+import bgmap.core.controller.*;
 import bgmap.core.model.Map;
+import static bgmap.core.model.Maf.*;
 
 public class MafViewer extends JFrame {
 
@@ -43,16 +25,16 @@ public class MafViewer extends JFrame {
 	
     private static MafViewerOkButtonListener OkButtonListener= new MafViewerOkButtonListener();      
     private static MafViewerCancelListener Cancelistener= new MafViewerCancelListener(); 		
-    private static JLabel subjectNameLabel = new JLabel("<html><div align=center>" + Maf.SubjectNameField + "</div></html>", SwingConstants.CENTER);
-    private static JLabel subjectAddressLabel = new JLabel("<html><div align=center>" + Maf.ObjectAddressField + "</div></html>", SwingConstants.CENTER);
-    private static JLabel subjectRegNumLabel = new JLabel("<html><div align=center>" + Maf.SubjectRegNumField + "</div></html>", SwingConstants.CENTER);
-    private static JLabel telephoneLabel = new JLabel("<html><div align=center>" + Maf.TelephoneField + "</div></html>", SwingConstants.CENTER);    
-    private static JLabel siteLabel = new JLabel("<html><div align=center>" + Maf.SiteField + "</div></html>", SwingConstants.CENTER);
-    private static JLabel purposeLabel = new JLabel("<html><div align=center>" + Maf.PurposeField + "</div></html>", SwingConstants.CENTER);
-    private static JLabel objectAddressLabel = new JLabel("<html><div align=center>" + Maf.ObjectAddressField + "</div></html>", SwingConstants.CENTER);
-    private static JLabel techCharacteristicsLabel = new JLabel("<html> <div align=center>" + Maf.TechCharacteristicsField + "</div></html>", SwingConstants.CENTER);
-    private static JLabel passportLabel = new JLabel("<html><div align=center>" + Maf.PassportField + "</div></html>", SwingConstants.CENTER);
-    private static JLabel personFullNameLabel = new JLabel("<html><div align=center>" + Maf.PersonFullNameField + "</div></html>", SwingConstants.CENTER);  
+    private static JLabel subjectNameLabel = new JLabel("<html><div align=center>" + SubjectNameField + "</div></html>", SwingConstants.CENTER);
+    private static JLabel subjectAddressLabel = new JLabel("<html><div align=center>" + ObjectAddressField + "</div></html>", SwingConstants.CENTER);
+    private static JLabel subjectRegNumLabel = new JLabel("<html><div align=center>" + SubjectRegNumField + "</div></html>", SwingConstants.CENTER);
+    private static JLabel telephoneLabel = new JLabel("<html><div align=center>" + TelephoneField + "</div></html>", SwingConstants.CENTER);    
+    private static JLabel siteLabel = new JLabel("<html><div align=center>" + SiteField + "</div></html>", SwingConstants.CENTER);
+    private static JLabel purposeLabel = new JLabel("<html><div align=center>" + PurposeField + "</div></html>", SwingConstants.CENTER);
+    private static JLabel objectAddressLabel = new JLabel("<html><div align=center>" + ObjectAddressField + "</div></html>", SwingConstants.CENTER);
+    private static JLabel techCharacteristicsLabel = new JLabel("<html> <div align=center>" + TechCharacteristicsField + "</div></html>", SwingConstants.CENTER);
+    private static JLabel passportLabel = new JLabel("<html><div align=center>" + PassportField + "</div></html>", SwingConstants.CENTER);
+    private static JLabel personFullNameLabel = new JLabel("<html><div align=center>" + PersonFullNameField + "</div></html>", SwingConstants.CENTER);  
 	private static Color color = new Color(238,238,238,100);
 	
     private static boolean isOpen = false;
@@ -74,10 +56,9 @@ public class MafViewer extends JFrame {
         frame.addWindowListener(Cancelistener);        
         frame.setSize(AppGUI.mapPanel.getSize().width/4, 
         		(int) (AppGUI.mainFrame.getOpacity() + AppGUI.mapPanel.getSize().height));
-        
-        int h = AppGUI.adminPanel !=null ? AppGUI.adminPanel.getHeight() : 0; 
+                
         Point p = new Point((int)(AppGUI.mainFrame.getX() +  AppGUI.mainFrame.getOpacity() + AppGUI.mainFrame.getInsets().left), 
-        		(int)(AppGUI.mainFrame.getY() + AppGUI.mainFrame.getOpacity() + AppGUI.mainFrame.getInsets().top + h));
+        		(int)(AppGUI.mainFrame.getY() + AppGUI.mainFrame.getOpacity() + AppGUI.mainFrame.getInsets().top));
      
         if (AppGUI.mapPanel.getMousePosition().x < AppGUI.mapPanel.getSize().width/2)
         	p.x = (int)(AppGUI.mainFrame.getX() + AppGUI.mainFrame.getOpacity() + AppGUI.mapPanel.getSize().width - frame.getSize().width);

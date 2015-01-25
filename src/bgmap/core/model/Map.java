@@ -28,13 +28,6 @@ public class Map {
 	public static void setImage(Image im) {
 		Map.image = im;
 	}
-
-	public Map() {	
-	}
-	
-	public Map(Image image) {
-		Map.image = image;
-	}
 	
 	public static short getStartRow() {
 		return startRow;
