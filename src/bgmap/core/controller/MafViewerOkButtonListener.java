@@ -18,33 +18,38 @@ public class MafViewerOkButtonListener implements ActionListener{
 	public void actionPerformed(ActionEvent e) {		
 		try{
 			if (e.getActionCommand().equals("delete")){
-				short x = (short) ((MafViewer.getPos().x - MapPanel.getPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
-				short y = (short) ((MafViewer.getPos().y - MapPanel.getPos().y - Map.getMapOffset().y)  % Map.partMapHeight);        		
-				byte colNum = (byte) (Map.getStartCol() + (MafViewer.getPos().x - MapPanel.getPos().x - Map.getMapOffset().x) / Map.partMapWidth );
-				byte rowNum = (byte) (Map.getStartRow() + (MafViewer.getPos().y - MapPanel.getPos().y - Map.getMapOffset().y) / Map.partMapHeight);
-				DBManager.deleteMaf(x, y, colNum, rowNum);
-				MafHashKey key = new MafHashKey(colNum, rowNum);
-	      		if (AppGUI.getAllMafs().containsKey(key)){
-	      			ArrayList<MafHashValue> list = AppGUI.getAllMafs().get(key);
-	      			if (list.size() == 1){
-	      				AppGUI.getAllMafs().remove(key);	      				
-	      			}
-	      			else {
-	      				MafHashValue coord = new MafHashValue(x, y, (byte) 2);
-	      	  			for (MafHashValue value:list)
-	      	  				if (coord.equals(value)){
-	      	  					list.remove(value);	      	  					
-	      	  					break;
-	      	  				}
-	      		}
-	      		if (AppGUI.getClickedMaf() != null)
-	    	    	AppGUI.setClickedMaf(null);
-	      		AppGUI.loadPartsMap(Map.getPngScale(), 
-					colNum, rowNum, (byte) 1, (byte) 1,
-					Map.getMapOffset().x + (colNum-Map.getStartCol())*Map.partMapWidth,
-					Map.getMapOffset().y + (rowNum-Map.getStartRow())*Map.partMapHeight);
-	      		}			
-	      		MafViewer.closeMafViewer();  
+				 if (JOptionPane.showConfirmDialog(AppGUI.mainFrame, 
+			    		  "Вы действительно хотите удалить объект?", 
+			    		  "Удаление объекта",JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+			    			   		  
+			    			  short x = (short) ((MafViewer.getMousePositionClick().x - Map.getMapPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
+			    			  short y = (short) ((MafViewer.getMousePositionClick().y - Map.getMapPos().y - Map.getMapOffset().y)  % Map.partMapHeight);        		
+			    			  byte colNum = (byte) (Map.getStartCol() + (MafViewer.getMousePositionClick().x - Map.getMapPos().x - Map.getMapOffset().x) / Map.partMapWidth );
+			    			  byte rowNum = (byte) (Map.getStartRow() + (MafViewer.getMousePositionClick().y - Map.getMapPos().y - Map.getMapOffset().y) / Map.partMapHeight);
+			    			  DBManager.deleteMaf(x, y, colNum, rowNum);
+			    			  MafHashKey key = new MafHashKey(colNum, rowNum);
+			    			  if (AppGUI.getAllMafs().containsKey(key)){
+			    				  ArrayList<MafHashValue> list = AppGUI.getAllMafs().get(key);
+			    				  if (list.size() == 1){
+			    					  AppGUI.getAllMafs().remove(key);	      				
+			    				  }
+			    				  else {
+			    					  MafHashValue coord = new MafHashValue(x, y, (byte) 2);
+			    					  for (MafHashValue value:list)
+			    						  if (coord.equals(value)){
+			    							  list.remove(value);	      	  					
+			    							  break;
+			    						  }
+			    				  }
+			    				  if (AppGUI.getClickedMaf() != null)
+			    					  AppGUI.setClickedMaf(null);
+			    				  AppGUI.loadPartsMap(Map.getPngScale(), 
+			    						  colNum, rowNum, (byte) 1, (byte) 1,
+			    						  Map.getMapOffset().x + (colNum-Map.getStartCol())*Map.partMapWidth,
+			    						  Map.getMapOffset().y + (rowNum-Map.getStartRow())*Map.partMapHeight);
+			    			  }
+			    			  MafViewer.closeMafViewer();
+				 }			    		  							
 			}else{
 				Maf maf;
 				if (MafViewer.subjectName.getText().isEmpty())  {
@@ -53,11 +58,11 @@ public class MafViewerOkButtonListener implements ActionListener{
 						    "fam editor error",
 						    JOptionPane.ERROR_MESSAGE);
 				}
-				else{
-					short x = (short) ((MafViewer.getPos().x - MapPanel.getPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
-					short y = (short) ((MafViewer.getPos().y - MapPanel.getPos().y - Map.getMapOffset().y)  % Map.partMapHeight);        		
-					byte colNum = (byte) (Map.getStartCol() + (MafViewer.getPos().x - MapPanel.getPos().x - Map.getMapOffset().x) / Map.partMapWidth );
-					byte rowNum = (byte) (Map.getStartRow() + (MafViewer.getPos().y - MapPanel.getPos().y - Map.getMapOffset().y) / Map.partMapHeight);
+				else{					
+					short x = (short) ((MafViewer.getMousePositionClick().x - Map.getMapPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
+					short y = (short) ((MafViewer.getMousePositionClick().y - Map.getMapPos().y - Map.getMapOffset().y)  % Map.partMapHeight);        		
+					byte colNum = (byte) (Map.getStartCol() + (MafViewer.getMousePositionClick().x - Map.getMapPos().x - Map.getMapOffset().x) / Map.partMapWidth );
+					byte rowNum = (byte) (Map.getStartRow() + (MafViewer.getMousePositionClick().y - Map.getMapPos().y - Map.getMapOffset().y) / Map.partMapHeight);
 				
 					maf = new Maf(x, y, colNum, rowNum, 
 							MafViewer.subjectName.getText().trim(), 

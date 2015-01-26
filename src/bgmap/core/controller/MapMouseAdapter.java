@@ -80,10 +80,10 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 		//check if exist maf
 		if (e.getClickCount() == 1){
 			AppGUI.setClickedMaf(null);
-    		short x = (short) ((e.getX() - MapPanel.getPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
-    		short y = (short) ((e.getY() - MapPanel.getPos().y - Map.getMapOffset().y)  % Map.partMapHeight); 
-    		byte colNum = (byte) (Map.getStartCol() + (e.getX() - MapPanel.getPos().x - Map.getMapOffset().x) / Map.partMapWidth );
-    		byte rowNum = (byte) (Map.getStartRow() + (e.getY() - MapPanel.getPos().y - Map.getMapOffset().y) / Map.partMapHeight);
+    		short x = (short) ((e.getX() - Map.getMapPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
+    		short y = (short) ((e.getY() - Map.getMapPos().y - Map.getMapOffset().y)  % Map.partMapHeight); 
+    		byte colNum = (byte) (Map.getStartCol() + (e.getX() - Map.getMapPos().x - Map.getMapOffset().x) / Map.partMapWidth );
+    		byte rowNum = (byte) (Map.getStartRow() + (e.getY() - Map.getMapPos().y - Map.getMapOffset().y) / Map.partMapHeight);
       		MafHashKey cell = new MafHashKey(colNum, rowNum);
       		if (AppGUI.getAllMafs().containsKey(cell)){
       			ArrayList<MafHashValue> list = AppGUI.getAllMafs().get(cell);

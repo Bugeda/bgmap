@@ -437,5 +437,15 @@ public class AppGUI extends AppConfig{
 		g.dispose();
 		AppGUI.mapPanel.repaint();	
 	}
+
+	/**
+	 * Save image under clicked maf when create new maf. 
+	 * If it cancel - image will be restore
+	 * @param maf
+	 */
+	public static void createBackUpImage(Maf maf) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }
