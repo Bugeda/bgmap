@@ -1,4 +1,4 @@
-package bgmap.core.view;
+package bgmap.core;
 
 import java.awt.*;
 import java.io.File;
@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import bgmap.core.AppConfig;
+import bgmap.AppConfig;
 import bgmap.core.controller.MapMouseAdapter;
 import bgmap.core.model.Map;
 

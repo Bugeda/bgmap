@@ -1,4 +1,4 @@
-package bgmap.core;
+package bgmap;
 
 /*
 *

@@ -1,4 +1,4 @@
-package bgmap.core;
+package bgmap;
 
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -80,10 +80,10 @@ public class AppConfig {
 	 * @param isAdmin - if adminApp
 	 */
 
-	protected static void setConfig(boolean debug, boolean wORKDEBUG, boolean isAdmin){
+	protected static void setConfig(boolean debug, boolean workDebug, boolean isAdmin){
 		PropertyConfigurator.configure("log4j.properties");	
 		AppConfig.DEBUG = debug;
-		AppConfig.WORKDEBUG = wORKDEBUG;
+		AppConfig.WORKDEBUG = workDebug;
 		AppConfig.ADMIN = isAdmin;
 	}
 }

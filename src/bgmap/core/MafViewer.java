@@ -1,10 +1,10 @@
-package bgmap.core.view;
+package bgmap.core;
 
 import java.awt.*;
 
 import javax.swing.*;
 
-import bgmap.core.*;
+import bgmap.*;
 import bgmap.core.controller.*;
 import bgmap.core.model.Maf;
 import bgmap.core.model.Map;
@@ -65,6 +65,8 @@ public class MafViewer extends JFrame {
         ((JComponent) frame.getContentPane()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         frame.setVisible(true);		
         isOpen=true;
+        AppGUI.slider.setValue(100);
+        Map.setScrollable(false);
     }
     
     private static void initViewerFrame(){  	
@@ -79,13 +81,21 @@ public class MafViewer extends JFrame {
         ((JComponent) frame.getContentPane()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         frame.setVisible(true);		
         isOpen=true;        
+        AppGUI.slider.setValue(100);
+        Map.setScrollable(false);
     }
-    
     public static void closeMafViewer(){
+    	closeMafViewer("");
+    } 
+    public static void closeMafViewer(String param){
     	if (isOpen){    		
+    		if (MafViewer.frame.getName().equals("insert")&&(param.equals("cancel"))){
+    			AppGUI.eraseInsertedMark();
+    		}
     		AppGUI.mainFrame.setEnabled(true);
 			MafViewer.frame.dispose();   		
 			isOpen=false;
+			Map.setScrollable(true);
     	}
 	}
     
@@ -95,16 +105,8 @@ public class MafViewer extends JFrame {
 			
 			frame.setName("insert");
 			mousePositionClick = AppGUI.mapPanel.getMousePosition();   
-			short x = (short) ((MafViewer.getMousePositionClick().x - Map.getMapPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
-			short y = (short) ((MafViewer.getMousePositionClick().y - Map.getMapPos().y - Map.getMapOffset().y)  % Map.partMapHeight);        		
-			byte colNum = (byte) (Map.getStartCol() + (MafViewer.getMousePositionClick().x - Map.getMapPos().x - Map.getMapOffset().x) / Map.partMapWidth );
-			byte rowNum = (byte) (Map.getStartRow() + (MafViewer.getMousePositionClick().y - Map.getMapPos().y - Map.getMapOffset().y) / Map.partMapHeight);			
-			Maf maf = new Maf(x, y, colNum, rowNum, "", "", (byte) 0, "", "", "", "", "", "", "");
-					
-			AppGUI.createBackUpImage(maf);
-			AppGUI.setClickedMaf(maf);
-			
-			AppGUI.paintClickedMaf(AppConfig.MafsMarks[3], false);
+									
+			AppGUI.paintInsertMark();					
 			
 			subjectName = new JTextField();
 			subjectName.addActionListener(OkButtonListener);

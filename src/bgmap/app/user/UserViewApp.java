@@ -1,7 +1,7 @@
 package bgmap.app.user;
 
-import bgmap.core.AppConfig;
-import bgmap.core.view.AppGUI;
+import bgmap.AppConfig;
+import bgmap.core.AppGUI;
 
 public class UserViewApp extends AppGUI {
 	   public static void main(String[] args){				

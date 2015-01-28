@@ -1,6 +1,6 @@
 package bgmap.core.model;
 
-import bgmap.core.AppConfig;
+import bgmap.AppConfig;
 
 public class MafHashValue{
 

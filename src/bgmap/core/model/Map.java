@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
 
-import bgmap.core.AppConfig;
+import bgmap.AppConfig;
 
 public class Map {	
 	
@@ -18,9 +18,10 @@ public class Map {
 	private static byte startRow = 1;	
 	private static byte startCol = 1;    
 	private static byte pngScale = 1;
-	private static Point mapOffset;
+	private static Point mapOffset = new Point(0,0);
 	private static Dimension size;
 	private static Point mapPos;	
+	private static boolean scrollable = true;
 	
 	public static Image getImage() {
 		return image;
@@ -64,7 +65,7 @@ public class Map {
 
 	public static boolean isScrollable(Point point) {
 		//ViewMapTest.impanel.offset=new Point(0,0);
-		return true;
+		return scrollable;
 	}
 	
 	public static Dimension getSize() {
@@ -77,6 +78,14 @@ public class Map {
 
 	public static void setMapPos(Point mapPos) {
 		Map.mapPos = mapPos;
+	}
+
+	public static boolean isScrollable() {
+		return scrollable;
+	}
+
+	public static void setScrollable(boolean scrollable) {
+		Map.scrollable = scrollable;
 	}
 
 }

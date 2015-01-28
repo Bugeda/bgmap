@@ -6,9 +6,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import bgmap.core.*;
+import bgmap.*;
+import bgmap.core.AppGUI;
 import bgmap.core.model.*;
-import bgmap.core.view.AppGUI;
 
 public class Divide extends AppGUI{	
 	public static final String srcMapPath = "src/images/src/";
