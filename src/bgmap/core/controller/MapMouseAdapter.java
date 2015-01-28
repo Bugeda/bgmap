@@ -8,22 +8,23 @@ import java.util.ArrayList;
 
 import javax.swing.event.MouseInputListener;
 
-import static bgmap.core.AppConfig.*;
+import static bgmap.AppConfig.*;
+import bgmap.core.*;
 import bgmap.core.model.*;
 import bgmap.core.model.dao.DBManager;
-import bgmap.core.view.*;
 
 public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener, MouseInputListener {
 
-	private Point startMovePoint;
+	private static Point startMovePoint;
+	private static boolean isClicked = false;
 	
-	private void setMoveFrom(Point p){
+	private static void setMoveFrom(Point p){
 		startMovePoint = p;
 		startMovePoint.x -= AppGUI.mapPanel.getOffset().x;
 		startMovePoint.y -= AppGUI.mapPanel.getOffset().y;		
 	}
 	
-	private void setMoveTo(Point p){		   
+	private static void setMoveTo(Point p){		   
 		if (startMovePoint!=null){
 			MapPanel.setOffset(new Point(p.x - startMovePoint.x, p.y - startMovePoint.y));			
 			AppGUI.mapPanel.repaint();
@@ -31,14 +32,16 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 	}
 	
     @Override
-	public void mouseWheelMoved(MouseWheelEvent e) {		
-    	int wheel = e.getWheelRotation();
-		if ((wheel<0)&&(AppGUI.slider.getValue()-wheel>AppGUI.MIN_scale)){	
-			AppGUI.slider.setValue(AppGUI.slider.getValue()-wheel);		
-		}
-		if ((wheel>0)&&(AppGUI.slider.getValue()-wheel<AppGUI.MAX_scale)){		
-			AppGUI.slider.setValue(AppGUI.slider.getValue()-wheel);
-		}		
+	public void mouseWheelMoved(MouseWheelEvent e) {
+    	if (Map.isScrollable()){
+    		int wheel = e.getWheelRotation();
+    		if ((wheel<0)&&(AppGUI.slider.getValue()-wheel>AppGUI.MIN_scale)){	
+    			AppGUI.slider.setValue(AppGUI.slider.getValue()-wheel);		
+    		}
+    		if ((wheel>0)&&(AppGUI.slider.getValue()-wheel<AppGUI.MAX_scale)){		
+    			AppGUI.slider.setValue(AppGUI.slider.getValue()-wheel);
+    		}
+    	}
     }
 	 
     @Override
@@ -72,18 +75,25 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+
   		//repaint selected maf
 		if (AppGUI.getClickedMaf()!=null){
 			MafViewer.closeMafViewer();
-			AppGUI.paintClickedMaf(MafsMarks[AppGUI.getClickedMaf().getMafMark()], false);
-		}
-		//check if exist maf
-		if (e.getClickCount() == 1){
+			AppGUI.paintClickedMaf(AppGUI.getClickedMaf().getMafMark(), false);
+		}	
+			if ((e.getModifiersEx()==InputEvent.SHIFT_DOWN_MASK)&&(bgmap.AppConfig.isAdmin())){	
+				AppGUI.slider.setValue(100);			
+				MafViewer.createEditor();
+			}			
+			
+		else {		
 			AppGUI.setClickedMaf(null);
-    		short x = (short) ((e.getX() - MapPanel.getPos().x - Map.getMapOffset().x) % Map.partMapWidth); 
-    		short y = (short) ((e.getY() - MapPanel.getPos().y - Map.getMapOffset().y)  % Map.partMapHeight); 
-    		byte colNum = (byte) (Map.getStartCol() + (e.getX() - MapPanel.getPos().x - Map.getMapOffset().x) / Map.partMapWidth );
-    		byte rowNum = (byte) (Map.getStartRow() + (e.getY() - MapPanel.getPos().y - Map.getMapOffset().y) / Map.partMapHeight);
+	
+    		short x = (short) AppGUI.getCoordinatesByMousePos(e.getPoint()).x; 
+    		short y = (short) AppGUI.getCoordinatesByMousePos(e.getPoint()).y; 
+    		byte colNum = (byte) AppGUI.getCellByMousePos(e.getPoint()).x;
+    		byte rowNum = (byte) AppGUI.getCellByMousePos(e.getPoint()).y;
+    		
       		MafHashKey cell = new MafHashKey(colNum, rowNum);
       		if (AppGUI.getAllMafs().containsKey(cell)){
       			ArrayList<MafHashValue> list = AppGUI.getAllMafs().get(cell);
@@ -101,25 +111,20 @@ public class MapMouseAdapter implements MouseWheelListener, MouseMotionListener,
       	  				}
       	  			}
       	  		}
-		}
-		if (bgmap.core.AppConfig.isAdmin()){
-			AppGUI.slider.setValue(100);
-			if (e.getClickCount() == 2) 
-				MafViewer.createEditor();
-			else 		 		    	 
+      		
+      		if (bgmap.AppConfig.isAdmin()){	 		    	 
 		      	if (AppGUI.getClickedMaf()!=null){		
-		      		System.out.println("click");
-		      		AppGUI.paintClickedMaf(MafsMarks[2], false);	
+		      		AppGUI.paintClickedMaf((byte) 2, false);	
 		      		MafViewer.editClickedMaf();		      		
 		      	}
-		}
-		else {
-			if (AppGUI.getClickedMaf()!=null) {
-				AppGUI.paintClickedMaf(MafsMarks[2], false);
-				System.out.println("click");
-	    		MafViewer.showClickedMafInfo();		
-			}
-		}		
+      		}
+      		else {
+      			if (AppGUI.getClickedMaf()!=null) {
+      				AppGUI.paintClickedMaf((byte) 2, false);
+      				MafViewer.showClickedMafInfo();		
+      			}
+      		}	
+		} 
 	}
 
 	@Override

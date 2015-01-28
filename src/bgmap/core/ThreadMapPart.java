@@ -1,4 +1,4 @@
-package bgmap.core.view;
+package bgmap.core;
 
 
 import java.awt.Color;
@@ -8,6 +8,7 @@ import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import bgmap.AppConfig;
 import bgmap.core.model.*;
 
 public class ThreadMapPart implements Runnable {
@@ -22,6 +23,9 @@ public class ThreadMapPart implements Runnable {
 	public static int getMapPartCounts() {
 		return mapPartCounts;
 	}
+	public static int getSumPartCount() {
+		return sumPartCount;
+	}
 	/**
 	 * set sumPartCount = 0 to calculate how much parts has been loaded
 	 * clear repaintsMaf to keep loaded cells
@@ -33,9 +37,7 @@ public class ThreadMapPart implements Runnable {
 		AppGUI.repaintMafs = new MafHashMap();	
 	}		
 
-	public static int getSumPartCount() {
-		return sumPartCount;
-	}
+
 	
 	/**
 	 * create ThreadMapPart to load and paint cell
@@ -65,11 +67,13 @@ public class ThreadMapPart implements Runnable {
 		
 		Image map = new javax.swing.ImageIcon(AppGUI.getPartMapUrl(dy,dx)).getImage();
 		Graphics g = Map.getImage().getGraphics();
-	//	g.setColor(Color.RED);
-	//	g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 60));	
 		g.drawImage(map, drawX + columnCount * Map.partMapWidth, drawY + rowCount * Map.partMapHeight, null);
-	//	g.drawRect(drawX+x * Map.partMapWidth, drawY+y * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);
-	//	g.drawString(dy+" "+dx, drawX+x* Map.partMapWidth+150, drawY+y* Map.partMapHeight+200);	
+		if (AppConfig.isWORKDEBUG()){
+			g.setColor(Color.RED);
+			g.setFont(new Font(g.getFont().getFontName(), Font.PLAIN, 60));
+			g.drawRect(drawX+columnCount * Map.partMapWidth, drawY+rowCount * Map.partMapHeight, Map.partMapWidth,Map.partMapHeight);
+			g.drawString(dy+" "+dx, drawX+columnCount* Map.partMapWidth+150, drawY+rowCount* Map.partMapHeight+200);
+		}
 		
 		MafHashKey key = new MafHashKey(dx, dy);  
 		AppGUI.repaintMafs.put(key, AppGUI.getAllMafs().get(key));
@@ -79,6 +83,5 @@ public class ThreadMapPart implements Runnable {
 		g.dispose();
 		
 		ThreadMapPart.sumPartCount++;
-
 	}
 }

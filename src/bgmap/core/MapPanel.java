@@ -1,4 +1,4 @@
-package bgmap.core.view;
+package bgmap.core;
 
 import java.awt.*;
 import java.io.File;
@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import bgmap.core.AppConfig;
+import bgmap.AppConfig;
 import bgmap.core.controller.MapMouseAdapter;
 import bgmap.core.model.Map;
 
@@ -16,8 +16,7 @@ public class MapPanel extends JPanel {
 
     	private static Image image;  
  	    private static double scale; 	        
- 	    private static Point offset;
- 	    private static Point pos;
+ 	    private static Point offset; 	
 	
 		private MapMouseAdapter movingAdapt = new MapMouseAdapter(); 
 		
@@ -27,13 +26,6 @@ public class MapPanel extends JPanel {
 
 		public static void setOffset(Point offset) {
 			MapPanel.offset = offset;
-		}
-		public static Point getPos() {
-			return pos;
-		}
-
-		public static void setPos(Point pos) {
-			MapPanel.pos = pos;
 		}
 
 		public void setScale(double s) {  
@@ -66,7 +58,7 @@ public class MapPanel extends JPanel {
 		private void initPanel(){
 			scale = 1.0;  			
 			Map.setMapOffset(new Point(0,0));
-			setPos(new Point(0,0));
+			Map.setMapPos(new Point(0,0));
 			addMouseMotionListener(movingAdapt);
 			addMouseListener(movingAdapt);
 			addMouseWheelListener(movingAdapt);
@@ -76,7 +68,7 @@ public class MapPanel extends JPanel {
 				int newImageHeight = (int) (image.getHeight(null)*scale);    	   	     
 				int x = (getWidth() - newImageWidth)/2;  
 				int y = (getHeight() - newImageHeight)/2;
-				setPos(new Point(x,y));
+				Map.setMapPos(new Point(x,y));
 			} 
 		   
 		}
@@ -99,7 +91,7 @@ public class MapPanel extends JPanel {
     	        int newImageHeight = (int) (image.getHeight(null)*scale);    	   	     
     	        int x = (getWidth() - newImageWidth)/2;  
     	        int y = (getHeight() - newImageHeight)/2; 
-				setPos(new Point(x,y));	
+    	        Map.setMapPos(new Point(x,y));	
     	        //int x = 0;  
     	        //int y = 0;
     	        Graphics2D g2 = (Graphics2D)g;                	   

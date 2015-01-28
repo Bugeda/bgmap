@@ -3,7 +3,7 @@ package bgmap.core.model.dao;
 import java.sql.*;
 import java.util.ArrayList;
 
-import bgmap.core.AppConfig;
+import bgmap.AppConfig;
 import bgmap.core.model.Maf;
 import bgmap.core.model.MafHashKey;
 import bgmap.core.model.MafHashMap;

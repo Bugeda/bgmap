@@ -1,11 +1,12 @@
-package bgmap.core.view;
+package bgmap.core;
 
 import java.awt.*;
 
 import javax.swing.*;
 
-import bgmap.core.*;
+import bgmap.*;
 import bgmap.core.controller.*;
+import bgmap.core.model.Maf;
 import bgmap.core.model.Map;
 import static bgmap.core.model.Maf.*;
 
@@ -36,15 +37,12 @@ public class MafViewer extends JFrame {
     private static JLabel passportLabel = new JLabel("<html><div align=center>" + PassportField + "</div></html>", SwingConstants.CENTER);
     private static JLabel personFullNameLabel = new JLabel("<html><div align=center>" + PersonFullNameField + "</div></html>", SwingConstants.CENTER);  
 	private static Color color = new Color(238,238,238,100);
-	
-    private static boolean isOpen = false;
-    private static Point pos = null;
+	private static Point mousePositionClick = null;
+
+    private static boolean isOpen = false;    
     
-	public static Point getPos() {
-		return MafViewer.pos;
-	}
-	public static void setPos(Point pos) {
-		MafViewer.pos = pos;
+	public static Point getMousePositionClick() {
+		return MafViewer.mousePositionClick;
 	}
        
     private static void initEditorFrame(){
@@ -67,6 +65,8 @@ public class MafViewer extends JFrame {
         ((JComponent) frame.getContentPane()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         frame.setVisible(true);		
         isOpen=true;
+        AppGUI.slider.setValue(100);
+        Map.setScrollable(false);
     }
     
     private static void initViewerFrame(){  	
@@ -81,19 +81,32 @@ public class MafViewer extends JFrame {
         ((JComponent) frame.getContentPane()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         frame.setVisible(true);		
         isOpen=true;        
+        AppGUI.slider.setValue(100);
+        Map.setScrollable(false);
     }
-    
     public static void closeMafViewer(){
+    	closeMafViewer("");
+    } 
+    public static void closeMafViewer(String param){
     	if (isOpen){    		
+    		if (MafViewer.frame.getName().equals("insert")&&(param.equals("cancel"))){
+    			AppGUI.eraseInsertedMark();
+    		}
     		AppGUI.mainFrame.setEnabled(true);
 			MafViewer.frame.dispose();   		
 			isOpen=false;
+			Map.setScrollable(true);
     	}
 	}
     
 	public static void createEditor() {
 		if (!isOpen){
 			frame = new JFrame("Добавить МАФ");
+			
+			frame.setName("insert");
+			mousePositionClick = AppGUI.mapPanel.getMousePosition();   
+									
+			AppGUI.paintInsertMark();					
 			
 			subjectName = new JTextField();
 			subjectName.addActionListener(OkButtonListener);
@@ -135,7 +148,7 @@ public class MafViewer extends JFrame {
 		    personFullName.addActionListener(OkButtonListener);
 		    personFullName.addKeyListener(Cancelistener);		 
 			        
-			pos=AppGUI.mapPanel.getMousePosition();      
+		    mousePositionClick=AppGUI.mapPanel.getMousePosition();      
 			
 			JPanel topPanel = new JPanel();        
 			topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
@@ -170,8 +183,7 @@ public class MafViewer extends JFrame {
 	        topPanel.add(personFullNameLabel);
 	        topPanel.add(personFullName);   
 	        
-	        JButton okButton = new JButton("Ok");
-		    okButton.setActionCommand("insert");
+	        JButton okButton = new JButton("Ok");		    
 		    okButton.addActionListener(OkButtonListener);
 		    okButton.addKeyListener(Cancelistener);		    
 
@@ -196,59 +208,50 @@ public class MafViewer extends JFrame {
 		if (!isOpen){
 			frame = new JFrame("Изменить МАФ");
 			
+			frame.setName("update");
 			subjectName = new JTextField(AppGUI.getClickedMaf().getSubjectName());
 			subjectName.addActionListener(OkButtonListener);
 			subjectName.addKeyListener(Cancelistener);	
-			subjectName.setActionCommand("update");
-			
+		
 			subjectAddress = new JTextField(AppGUI.getClickedMaf().getSubjectAddress());
 			subjectAddress.addActionListener(OkButtonListener);
 			subjectAddress.addKeyListener(Cancelistener);
-			subjectAddress.setActionCommand("update");
 	
 			subjectRegNum = new DecimalTextField(AppGUI.getClickedMaf().getSubjectRegNum());	    
 		    subjectRegNum.addActionListener(OkButtonListener);
 		    subjectRegNum.addKeyListener(Cancelistener);
-		    subjectAddress.setActionCommand("update");
 		    
 		    telephone = new JTextField(AppGUI.getClickedMaf().getTelephone());
 		    telephone.addActionListener(OkButtonListener);
 		    telephone.addKeyListener(Cancelistener);
-		    telephone.setActionCommand("update");
 	
 		    site = new JFormattedTextField(new RegexFormatter("www.[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"));
 		    site.setText(AppGUI.getClickedMaf().getSite());
 		    site.addActionListener(OkButtonListener);
 		    site.addKeyListener(Cancelistener);
-		    site.setActionCommand("update");
 
 		    purpose = new JTextField(AppGUI.getClickedMaf().getPurpose());
 		    purpose.addActionListener(OkButtonListener);
 		    purpose.addKeyListener(Cancelistener);
-		    purpose.setActionCommand("update");
 
 		    objectAddress = new JTextField(AppGUI.getClickedMaf().getObjectAddress());
 		    objectAddress.addKeyListener(Cancelistener);
 		    objectAddress.addActionListener(OkButtonListener);
-		    objectAddress.setActionCommand("update");
 
 		    techCharacteristics = new JTextField(AppGUI.getClickedMaf().getTechCharacteristics());
 		    techCharacteristics.addActionListener(OkButtonListener);
 		    techCharacteristics.addKeyListener(Cancelistener);
-		    techCharacteristics.setActionCommand("update");
 		        
 		    passport = new JTextField(AppGUI.getClickedMaf().getPassport());
 		    passport.addActionListener(OkButtonListener);
 		    passport.addKeyListener(Cancelistener);
-		    passport.setActionCommand("update");
 	
 		    personFullName = new JTextField(AppGUI.getClickedMaf().getPersonFullName());
 		    personFullName.addActionListener(OkButtonListener);
 		    personFullName.addKeyListener(Cancelistener);
-		    personFullName.setActionCommand("update");			        
 				    
-			pos = new Point(AppGUI.getClickedMaf().getX() + (AppGUI.getClickedMaf().getColNum()-Map.getStartCol())*Map.partMapWidth + MapPanel.getPos().x + Map.getMapOffset().x,
-					AppGUI.getClickedMaf().getY() + (AppGUI.getClickedMaf().getRowNum()-Map.getStartRow())*Map.partMapHeight + MapPanel.getPos().y + Map.getMapOffset().y);			
+		    mousePositionClick = new Point(AppGUI.getClickedMaf().getX() + (AppGUI.getClickedMaf().getColNum()-Map.getStartCol())*Map.partMapWidth + Map.getMapPos().x + Map.getMapOffset().x,
+					AppGUI.getClickedMaf().getY() + (AppGUI.getClickedMaf().getRowNum()-Map.getStartRow())*Map.partMapHeight + Map.getMapPos().y + Map.getMapOffset().y);			
 
 	        JPanel topPanel = new JPanel();        
 	        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
@@ -284,7 +287,6 @@ public class MafViewer extends JFrame {
 	        topPanel.add(personFullName);   
 	        
 	        JButton okButton = new JButton("Ok");
-		    okButton.setActionCommand("update");
 		    okButton.addActionListener(OkButtonListener);
 		    okButton.addKeyListener(Cancelistener);		    
 
@@ -327,8 +329,8 @@ public class MafViewer extends JFrame {
 			    JLabel passport = new JLabel(AppGUI.getClickedMaf().getPassport());
 			    JLabel personFullName = new JLabel(AppGUI.getClickedMaf().getPersonFullName());	        
 					    
-				pos = new Point(AppGUI.getClickedMaf().getX() + (AppGUI.getClickedMaf().getColNum()-Map.getStartCol())*Map.partMapWidth + MapPanel.getPos().x + Map.getMapOffset().x,
-						AppGUI.getClickedMaf().getY() + (AppGUI.getClickedMaf().getRowNum()-Map.getStartRow())*Map.partMapHeight + MapPanel.getPos().y + Map.getMapOffset().y);			
+			    mousePositionClick = new Point(AppGUI.getClickedMaf().getX() + (AppGUI.getClickedMaf().getColNum()-Map.getStartCol())*Map.partMapWidth + Map.getMapPos().x + Map.getMapOffset().x,
+						AppGUI.getClickedMaf().getY() + (AppGUI.getClickedMaf().getRowNum()-Map.getStartRow())*Map.partMapHeight + Map.getMapPos().y + Map.getMapOffset().y);			
 
 		        JPanel topPanel = new JPanel();   		       
 		        topPanel.add(subjectName);

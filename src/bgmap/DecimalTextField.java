@@ -1,4 +1,4 @@
-package bgmap.core;
+package bgmap;
 
 import javax.swing.JTextField;
 import javax.swing.text.AttributeSet;

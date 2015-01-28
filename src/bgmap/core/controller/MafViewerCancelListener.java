@@ -2,13 +2,13 @@ package bgmap.core.controller;
 
 import java.awt.event.*;
 
-import bgmap.core.view.MafViewer;
+import bgmap.core.MafViewer;
 
 public class MafViewerCancelListener implements ActionListener, WindowListener, KeyListener{
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {	
-		MafViewer.closeMafViewer();
+		MafViewer.closeMafViewer("cancel");
 	}
 
 	@Override
@@ -21,7 +21,7 @@ public class MafViewerCancelListener implements ActionListener, WindowListener, 
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		MafViewer.closeMafViewer();
+		MafViewer.closeMafViewer("cancel");
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class MafViewerCancelListener implements ActionListener, WindowListener, 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode()==KeyEvent.VK_ESCAPE){
-			MafViewer.closeMafViewer();
+			MafViewer.closeMafViewer("cancel");
 		}
 	}
 
