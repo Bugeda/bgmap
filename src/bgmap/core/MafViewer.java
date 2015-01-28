@@ -12,7 +12,7 @@ import static bgmap.core.model.Maf.*;
 
 public class MafViewer extends JFrame {
 
-	public static JFrame frame;	
+	public static JDialog frame;	
 	public static JTextField subjectName;
 	public static JTextField subjectAddress;
 	public static DecimalTextField subjectRegNum;
@@ -47,8 +47,7 @@ public class MafViewer extends JFrame {
        
     private static void initEditorFrame(){
         AppGUI.mainFrame.setEnabled(false);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setAlwaysOnTop(true);        
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);        
         frame.setUndecorated(true);
         frame.setResizable(false);
         frame.addWindowListener(Cancelistener);        
@@ -70,8 +69,7 @@ public class MafViewer extends JFrame {
     }
     
     private static void initViewerFrame(){  	
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setAlwaysOnTop(true);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);       
         frame.setUndecorated(true);
         frame.setBackground(color);
 //        frame.setResizable(false);
@@ -101,7 +99,7 @@ public class MafViewer extends JFrame {
     
 	public static void createEditor() {
 		if (!isOpen){
-			frame = new JFrame("Добавить МАФ");
+			frame = new JDialog(AppGUI.mainFrame,"Добавить МАФ");
 			
 			frame.setName("insert");
 			mousePositionClick = AppGUI.mapPanel.getMousePosition();   
@@ -206,7 +204,7 @@ public class MafViewer extends JFrame {
 	
 	public static void editClickedMaf(){
 		if (!isOpen){
-			frame = new JFrame("Изменить МАФ");
+			frame = new JDialog(AppGUI.mainFrame,"Изменить МАФ");
 			
 			frame.setName("update");
 			subjectName = new JTextField(AppGUI.getClickedMaf().getSubjectName());
@@ -316,7 +314,7 @@ public class MafViewer extends JFrame {
 		
 	public static void showClickedMafInfo(){
 			if (!isOpen){
-				frame = new JFrame("Информация о МАФе");
+				frame =  new JDialog(AppGUI.mainFrame,"Информация о МАФе");
 				
 				JLabel subjectName = new JLabel(AppGUI.getClickedMaf().getSubjectName());								
 				JLabel subjectAddress = new JLabel(AppGUI.getClickedMaf().getSubjectAddress());		
