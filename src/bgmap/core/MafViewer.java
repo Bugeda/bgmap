@@ -27,7 +27,7 @@ public class MafViewer extends JFrame {
     private static MafViewerOkButtonListener OkButtonListener= new MafViewerOkButtonListener();      
     private static MafViewerCancelListener Cancelistener= new MafViewerCancelListener(); 		
     private static JLabel subjectNameLabel = new JLabel("<html><div align=center>" + SubjectNameField + "</div></html>", SwingConstants.CENTER);
-    private static JLabel subjectAddressLabel = new JLabel("<html><div align=center>" + SubjectAddressField + "</div></html>", SwingConstants.CENTER);
+    private static JLabel subjectAddressLabel = new JLabel("<html><div align=center>" + ObjectAddressField + "</div></html>", SwingConstants.CENTER);
     private static JLabel subjectRegNumLabel = new JLabel("<html><div align=center>" + SubjectRegNumField + "</div></html>", SwingConstants.CENTER);
     private static JLabel telephoneLabel = new JLabel("<html><div align=center>" + TelephoneField + "</div></html>", SwingConstants.CENTER);    
     private static JLabel siteLabel = new JLabel("<html><div align=center>" + SiteField + "</div></html>", SwingConstants.CENTER);

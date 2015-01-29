@@ -81,7 +81,7 @@ public class AppConfig {
 	 */
 
 	protected static void setConfig(boolean debug, boolean workDebug, boolean isAdmin){
-		PropertyConfigurator.configure("log4j.properties");	
+		PropertyConfigurator.configure("src/log4j.properties");	
 		AppConfig.DEBUG = debug;
 		AppConfig.WORKDEBUG = workDebug;
 		AppConfig.ADMIN = isAdmin;

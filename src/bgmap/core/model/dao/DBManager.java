@@ -11,7 +11,7 @@ import bgmap.core.model.MafHashValue;
 
 public class DBManager {
 	private static final String JDBC_DRIVER = "org.sqlite.JDBC";
-	private static final String DB_URL = "jdbc:sqlite:map.db";
+	private static final String DB_URL = "jdbc:sqlite:src/map.db";
 	
 	public static void createDb() throws SQLException {	
 		String sql = "create table if not exists bgmap " +

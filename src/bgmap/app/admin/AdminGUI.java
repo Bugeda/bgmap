@@ -10,7 +10,9 @@ public class AdminGUI extends AppGUI {
 		AppConfig.setConfig(false, false, true);
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	            public void run() {
-	            		createAndShowGUI((byte)1,(byte)50,(byte)50);
+	            		createAndShowGUI((byte)1,(byte)50,(byte)23);
+	            		AppConfig.lgWARN.warn("warn");
+	            		AppConfig.lgDEBUG.debug("debug");
 	            }
 	        });
 	}    

@@ -19,32 +19,35 @@ public class Divide extends AppGUI{
 		//320 x 480
 		AppConfig.setConfig(false, true, true);
 		//ViewMapTest ma = new ViewMapTest(srcMapPath+"p1.png");		
-	
+		 int pos=47;
+		 String file=srcMapPath+"p31.png";
+		 byte x = 0;
 		 try {     
-			 BufferedImage image = ImageIO.read(new File(srcMapPath+"p22.png"));
+			 
+			 BufferedImage image = ImageIO.read(new File(file));
 			 int column = image.getWidth(null)/Map.partMapWidth;			
 	    	 int row = image.getHeight(null)/Map.partMapHeight; 
 	         if (AppConfig.isDEBUG()){
 	        	 AppConfig.lgTRACE.debug("column=" +column); 
 	        	 AppConfig.lgTRACE.debug("row= "+row); 
 	        	 }
-	         int pos=36;
+	        
 	         BufferedImage newImage = new BufferedImage(Map.partMapWidth, Map.partMapHeight, BufferedImage.TYPE_INT_RGB); 
 	         for(byte y = 0 ; y < row; y++) {
 	        	 
 	        	 AppConfig.lgDEBUG.debug("create "+AppConfig.mapsPath+"1_"+pos+"_x.png");
-	        	 for(byte x = 0; x < column; x++ ) {               
-	        		                	   		
+	        	 for(x = 0; x < column; x++ ) {               
+	        		 file = AppConfig.mapsPath+"1_"+pos+"_"+x+".png";               	   		
 	        		 newImage.createGraphics().drawImage(image, -x * Map.partMapWidth, -y * Map.partMapHeight, null);            	             		
-	        		 ImageIO.write(newImage, "png", new File(AppConfig.mapsPath+"1_"+pos+"_"+x+".png")); 
+	        		 ImageIO.write(newImage, "png", new File(file)); 
 	        		 if (AppConfig.isDEBUG()) 
-	        			 AppConfig.lgDEBUG.debug("create "+AppConfig.mapsPath+"1_"+pos+"_"+x+".png");
+	        			 AppConfig.lgDEBUG.debug("create "+file);
 	        	 	}
 	        	 pos++;
 	        	 }
 	         } catch (Exception e) {	        	 
-	        	 AppConfig.lgTRACE.error(e+" "+srcMapPath+"f.png");
-	        	 AppConfig.lgWARN.error(e+" "+srcMapPath+"f.png");
+	        	 AppConfig.lgTRACE.error(e+" "+file);
+	        	 AppConfig.lgWARN.error(e+" "+file);
 	        	 System.exit(1);	            
 	        	 }
 		 	AppConfig.lgTRACE.info("image has been cut");

@@ -75,7 +75,7 @@ public class MafViewerOkButtonListener implements ActionListener {
 							MafViewer.personFullName.getText().trim());
 					
 					if (MafViewer.frame.getName().equals("update")){				
-						DBManager.updateMaf(maf);						
+						DBManager.updateMaf(maf);
 						MafHashKey key = new MafHashKey(colNum, rowNum);
 			      		if (AppGUI.getAllMafs().containsKey(key)){
 			      			ArrayList<MafHashValue> list = AppGUI.getAllMafs().get(key);
@@ -85,9 +85,7 @@ public class MafViewerOkButtonListener implements ActionListener {
 			      	  					value.setFull(maf.getMafMark());
 			      	  					break;
 			      	  				}
-			      		}				
-			    		AppGUI.setClickedMaf(maf);	
-						AppGUI.paintClickedMaf(maf.getMafMark(),false);
+			      		}					      				      
 					}
 					else{									
 						DBManager.insertMaf(maf);

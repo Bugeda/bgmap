@@ -101,6 +101,7 @@ public class AppGUI extends AppConfig{
 	public static void createAndShowGUI(byte scale, byte x, byte y){	
 		mapPanel = new MapPanel(createMap(scale, x, y));	
 		createFrame();		
+		lgDEBUG.debug("started");
 	}
 	/**
 	 * Create map from parts of map,
